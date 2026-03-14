@@ -1,0 +1,8 @@
+﻿aether\rules\base_rule.py:22: error: Missing type parameters for generic type "dict"  [type-arg]
+aether\world\world_loader.py:9: error: Library stubs not installed for "yaml"  [import-untyped]
+aether\world\world_loader.py:9: note: Hint: "python3 -m pip install types-PyYAML"
+aether\world\world_loader.py:9: note: (or run "mypy --install-types" to install all missing stub packages)
+aether\world\world_loader.py:9: note: See https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
+aether\utils\logger.py:152: error: Module "os" does not explicitly export attribute "sys"  [attr-defined]
+aether\utils\logger.py:153: error: Module "os" does not explicitly export attribute "sys"  [attr-defined]
+Found 4 errors in 3 files (checked 43 source files)

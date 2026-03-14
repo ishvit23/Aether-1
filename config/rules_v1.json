@@ -1,0 +1,40 @@
+{
+  "rules": {
+    "hunger": {
+      "description": "Decays agent energy each tick, increases hunger",
+      "params": { "decay_rate": 1.0, "critical_threshold": 20.0 }
+    },
+    "movement": {
+      "description": "Agents move toward goals or wander randomly",
+      "params": { "max_steps": 1.0, "energy_cost": 0.5, "goal_bias": 0.3 }
+    },
+    "resource_spawn": {
+      "description": "Spawns food and material on the grid",
+      "params": { "spawn_interval": 1, "spawn_prob": 0.02, "amount": 5.0 }
+    },
+    "collect": {
+      "description": "Agents auto-collect resources from their cell",
+      "params": { "max_per_tick": 10.0, "capacity": 50.0 }
+    },
+    "combat": {
+      "description": "Resolves fights between aggressive co-located agents",
+      "params": { "range": 1, "damage_multiplier": 10.0, "flee_threshold": 15.0 }
+    },
+    "trade": {
+      "description": "Bilateral resource exchange between cooperative agents",
+      "params": { "offer_threshold": 5.0, "acceptance_prob_base": 0.5 }
+    },
+    "reproduction": {
+      "description": "Agents reproduce when energy exceeds threshold",
+      "params": { "energy_threshold": 80.0, "child_cost": 30.0 }
+    },
+    "mutation": {
+      "description": "Random trait mutations for genetic drift",
+      "params": { "rate": 0.05, "max_delta": 0.1 }
+    },
+    "death": {
+      "description": "Removes agents with zero energy/health or past max age",
+      "params": { "energy_floor": 0.0, "max_age": 500.0 }
+    }
+  }
+}

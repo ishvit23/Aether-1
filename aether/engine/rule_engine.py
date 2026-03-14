@@ -1,0 +1,97 @@
+"""Rule engine: loads, registers, and executes rules in configured order."""
+
+from __future__ import annotations
+
+from typing import Any
+
+from aether.rules.base_rule import Rule
+from aether.world.world import World
+
+
+class RuleEngine:
+    """Manages rule registration and ordered execution.
+
+    Rules are registered by name and instantiated with their config params.
+    The engine executes rules in the order specified by config.rules_order.
+
+    Attributes:
+        rules: Ordered list of instantiated Rule objects.
+    """
+
+    # Class-level registry mapping rule names to Rule subclasses
+    _registry: dict[str, type[Rule]] = {}
+
+    def __init__(self) -> None:
+        self.rules: list[Rule] = []
+
+    @classmethod
+    def register(cls, name: str, rule_cls: type[Rule]) -> None:
+        """Register a rule class by name.
+
+        Args:
+            name: Rule identifier (e.g. 'hunger', 'movement').
+            rule_cls: The Rule subclass to register.
+        """
+        cls._registry[name] = rule_cls
+
+    @classmethod
+    def get_registered(cls) -> dict[str, type[Rule]]:
+        """Return a copy of the rule registry."""
+        return dict(cls._registry)
+
+    def load_rules(
+        self,
+        rules_order: list[str],
+        rule_params: dict[str, dict[str, Any]],
+    ) -> None:
+        """Instantiate rules in the specified order with config params.
+
+        Args:
+            rules_order: List of rule names in execution order.
+            rule_params: Mapping of rule name to parameter dict.
+
+        Raises:
+            KeyError: If a rule name is not found in the registry.
+        """
+        self.rules = []
+        for name in rules_order:
+            if name not in self._registry:
+                raise KeyError(
+                    f"Rule '{name}' not found in registry. Available: {list(self._registry.keys())}"
+                )
+            params = rule_params.get(name, {})
+            rule_instance = self._registry[name](params)
+            self.rules.append(rule_instance)
+
+    def apply_all(self, world: World, tick: int) -> None:
+        """Execute all loaded rules in order.
+
+        Args:
+            world: The world to apply rules to.
+            tick: Current simulation tick.
+        """
+        for rule in self.rules:
+            rule.apply(world, tick)
+
+
+def register_all_rules() -> None:
+    """Register all built-in V1 rules with the RuleEngine."""
+    from aether.rules.collect_rule import CollectRule
+    from aether.rules.combat_rule import CombatRule
+    from aether.rules.death_rule import DeathRule
+    from aether.rules.hunger_rule import HungerRule
+    from aether.rules.movement_rule import MovementRule
+    from aether.rules.mutation_rule import MutationRule
+    from aether.rules.reproduction_rule import ReproductionRule
+    from aether.rules.resource_rule import ResourceSpawnRule
+    from aether.rules.trade_rule import TradeRule
+
+    RuleEngine.register("hunger", HungerRule)
+    RuleEngine.register("movement", MovementRule)
+    RuleEngine.register("resource_spawn", ResourceSpawnRule)
+    RuleEngine.register("collect", CollectRule)
+    RuleEngine.register("combat", CombatRule)
+    RuleEngine.register("trade", TradeRule)
+    RuleEngine.register("reproduction", ReproductionRule)
+    RuleEngine.register("mutation", MutationRule)
+    RuleEngine.register("death", DeathRule)
