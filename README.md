@@ -1,61 +1,116 @@
-# Aether-1
+<div align="center">
 
-Configurable multi-agent simulation engine for research-grade and production-grade simulations.
+# 🌌 Aether-1 
 
-## Quick Start
+**A high-performance, deterministic, configurable multi-agent simulation engine.**
+
+[![CI](https://github.com/ishvit23/Aether-1/actions/workflows/ci.yml/badge.svg)](https://github.com/ishvit23/Aether-1/actions/workflows/ci.yml)
+[![Python Version](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+</div>
+
+---
+
+## 📖 Overview
+
+**Aether-1** is a deterministic, modular grid-based simulation engine built in Python. Designed for research, AI experimentation, and complex system modeling, it allows thousands of unique agents to interact, trade, fight, reproduce, and mutate over customizable torus-wrapped topologies. 
+
+Powered by priority-based decision logic and an entirely decoupled rule engine, Aether-1 lets you define the physics and societal rules of the world exclusively through unified configuration structures.
+
+---
+
+## ✨ Key Features
+
+*   **🧬 High-Fidelity Agent Models:** Agents possess nuanced statistics (health, energy, hunger, age) and fully mutable genetic traits (speed, strength, intelligence, aggression, greed, cooperation). 
+*   **🌍 Deterministic Torus World:** The grid strictly adheres to seeded pseudorandom number generation to ensure 100% determinism. A torus wrapping matrix prevents boundary-clipping effects.
+*   **⚙️ Uncoupled Rule Engine:** The game loop is completely data-driven. Rules like `hunger`, `combat`, `trade`, and `mutation` are decoupled classes injected into the simulation sequentially. 
+*   **📊 Rich CLI & Metrics:** Experience beautiful console dashboards natively powered by `rich`. Automatically dump JSONL event structures and CSV metric checkpoints during execution. 
+*   **🏎️ Production Ready Codebase:** Heavily sanitized using modern tooling: `uv` package management, `ruff` auto-linting, `mypy --strict` typings, and sprawling `pytest` suites.
+
+---
+
+## 🚀 Quick Start
+
+### 1. Installation
+
+Aether-1 uses the blazingly fast [uv](https://github.com/astral-sh/uv) package manager. 
 
 ```bash
-# Install dependencies
+# Clone the repository
+git clone https://github.com/ishvit23/Aether-1.git
+cd Aether-1
+
+# Sync dependencies and create optimized virtual environment
 uv sync
+```
 
-# Run a simulation
-uv run python main.py run --config config/world_v1.json --seed 42 --ticks 100
+### 2. Run the Simulation
 
-# With console visualization
-uv run python main.py run --config config/world_v1.json --ticks 100 --viz console
+You can execute a full 500-tick simulation with a lively terminal dashboard using the built-in run command:
 
-# Validate a config file
+```bash
+uv run python main.py run --config config/world_v1.json --ticks 500 --viz console
+```
+
+### 3. Validate Configurations
+
+Verify your custom rule injections and population arrays before launching heavy simulations:
+```bash
 uv run python main.py validate-config --config config/world_v1.json
 ```
 
-## Development
+---
 
-```bash
-# Install with dev dependencies
-uv sync
+## 🛠️ Project Structure
 
-# Run tests
-uv run pytest -v
+The engine's architecture enforces strict separation of concerns to allow easy drop-in implementations for future milestones.
 
-# Run integration tests
-uv run pytest -m integration -v
-
-# Lint and format
-uv run ruff check .
-uv run ruff format .
-
-# Type check
-uv run mypy aether/
-```
-
-## Project Structure
-
-```
+```plaintext
 aether/
-  engine/       # Tick loop and rule engine
-  world/        # Grid, cells, world loader
-  agents/       # Agent model, traits, inventory, decision
-  rules/        # Modular rule classes (hunger, combat, trade, etc.)
-  actions/      # Action objects and executors
-  resources/    # Generic resource models
-  viz/          # Console (rich) and Pygame visualization
-  utils/        # Logger, constants, RNG factory
-  simulation/   # Orchestration
-config/         # JSON/YAML world configs
-tests/          # Unit and integration tests
+├── actions/        # Executors for atomic operations (Trade, Attack, Move)
+├── agents/         # Agent dataclass, genetic traits, and inventory logic
+├── engine/         # The core TickEngine loop and sequential RuleEngine
+├── resources/      # Abstracted models mapping world tangibles
+├── rules/          # Drop-in ABC implementations for world physics/interaction
+├── simulation/     # Top-level orchestration module
+├── utils/          # Factory RNGs, constants, and logging mechanisms
+└── viz/            # Console grid rendering and Pygame dashboard scaffolding
+config/             # Extensible JSON/YAML files determining world states
+tests/              # Robust 60+ assertion test suite matching strict metrics
 ```
 
-## Recent Changes
+---
 
-- v0.1.0: Initial repo skeleton, CI, and placeholder tests
-- v0.2.0-dev: Full V1 engine implementation — world, agents, rules, actions, visualization
+## 💻 Development & Contributing
+
+### Setup Hooks & Dependencies
+Ensure you have the development layer installed to run local checks.
+```bash
+uv sync --extra dev
+pre-commit install
+```
+
+### Running the Test Suite
+Aether-1 maintains 100% passing tests for robust architectural guarantees.
+```bash
+# Execute unit and integration tests
+uv run pytest -v 
+
+# Static analysis 
+uv run mypy aether/
+uv run ruff check .
+```
+
+---
+
+## 🗺️ Roadmap / Milestones
+
+- [x] **Milestone 1:** World Core & Topology Wrapping
+- [x] **Milestone 2:** Agent Models & Priority Matrix Decisions
+- [x] **Milestone 3:** Core Engines (Tick / Rule) & Action TypedDicts
+- [x] **Milestone 4:** Complex Logic (Trade, Combat, Evolution, Genetics)
+- [ ] **Milestone 7:** Advanced Logging & Event Reconstruction Replays
+- [ ] **Milestone 8:** UI Overhauls (Pygame Integration) & Web Hook Automations
