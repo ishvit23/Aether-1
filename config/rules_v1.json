@@ -10,7 +10,7 @@
     },
     "resource_spawn": {
       "description": "Spawns food and material on the grid",
-      "params": { "spawn_interval": 1, "spawn_prob": 0.02, "amount": 5.0 }
+      "params": { "spawn_interval": 1, "spawn_prob": 0.08, "amount": 5.0 }
     },
     "collect": {
       "description": "Agents auto-collect resources from their cell",
@@ -26,7 +26,7 @@
     },
     "reproduction": {
       "description": "Agents reproduce when energy exceeds threshold",
-      "params": { "energy_threshold": 80.0, "child_cost": 30.0 }
+      "params": { "energy_threshold": 50.0, "child_cost": 30.0 }
     },
     "mutation": {
       "description": "Random trait mutations for genetic drift",

@@ -9,9 +9,9 @@
     "speed":       [0.1, 1.0],
     "strength":    [0.1, 1.0],
     "intelligence":[0.1, 1.0],
-    "aggression":  [0.0, 1.0],
+    "aggression":  [0.0, 0.4],
     "greed":       [0.0, 1.0],
-    "cooperation": [0.0, 1.0]
+    "cooperation": [0.4, 1.0]
   },
   "initial_inventory": {}
 }

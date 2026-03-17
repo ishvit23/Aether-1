@@ -85,3 +85,51 @@ def render_console(world: World, tick: int, grid_sample_size: int = 20) -> None:
     )
     console.print(stats_table)
     console.print(legend)
+
+
+def replay_log(log_path: str) -> None:
+    """Read a JSONL event log and display events tick-by-tick.
+
+    Args:
+        log_path: Path to the JSONL log file.
+    """
+    import json
+    from collections import defaultdict
+
+    events_by_tick: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    max_tick = 0
+
+    try:
+        with open(log_path, encoding="utf-8") as f:
+            for line in f:
+                event = json.loads(line)
+                tick = event["tick"]
+                events_by_tick[tick].append(event)
+                max_tick = max(max_tick, tick)
+    except FileNotFoundError:
+        console.print(f"[bold red]Error:[/] Log file not found: {log_path}")
+        return
+
+    console.clear()
+    console.print(Panel(f"REPLAY MODE: {log_path}", style="bold magenta"))
+
+    for tick in range(max_tick + 1):
+        tick_events = events_by_tick.get(tick, [])
+        if not tick_events:
+            continue
+
+        table = Table(title=f"Events for Tick {tick}", show_header=True, header_style="bold green")
+        table.add_column("Type", style="cyan")
+        table.add_column("Details", style="white")
+
+        for ev in tick_events:
+            event_type = ev["event"]
+            payload = ev["payload"]
+            details = ", ".join(f"{k}={v}" for k, v in payload.items())
+            table.add_row(event_type, details)
+
+        console.print(table)
+        input("\nPress Enter for next tick (Ctrl+C to exit)...")
+        console.clear()
+
+    console.print("[bold green]Replay finished.[/]")

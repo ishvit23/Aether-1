@@ -57,16 +57,19 @@ class Simulation:
         # Build world
         self.world = WorldLoader.build_world(self.config)
 
+        # Set up logging
+        self.event_logger = EventLogger()
+        self.metrics_writer = MetricsWriter()
+        actual_seed = self.config.get("seed", 42)
+        write_run_metadata(actual_seed, config_path)
+
         # Set up rules
         register_all_rules()
         self.rule_engine = RuleEngine()
         rule_params = WorldLoader.get_rule_params(self.config)
-        self.rule_engine.load_rules(self.config["rules_order"], rule_params)
-
-        # Set up logging
-        self.event_logger = EventLogger()
-        self.metrics_writer = MetricsWriter()
-        write_run_metadata(actual_seed, config_path)
+        self.rule_engine.load_rules(
+            self.config["rules_order"], rule_params, logger=self.event_logger
+        )
 
         # Build tick engine
         self.engine = TickEngine(

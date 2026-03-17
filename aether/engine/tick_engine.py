@@ -166,7 +166,11 @@ class TickEngine:
         self._tick_combats = 0
 
         # 1. Apply all rules in order
+        pop_before_rules = self.world.population_size()
         self.rule_engine.apply_all(self.world, tick)
+        pop_after_rules = self.world.population_size()
+        self._tick_births += max(0, pop_after_rules - pop_before_rules)
+        self._tick_deaths += max(0, pop_before_rules - pop_after_rules)
 
         # 2. Collect agent actions
         actions = self.collect_actions()

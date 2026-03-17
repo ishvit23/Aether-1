@@ -128,6 +128,7 @@ class WorldLoader:
             y = world.rng.randint(0, world.height - 1)
             traits = generate_traits(world.rng, agents_config)
             stats = dict(DEFAULT_STATS)
+            stats["energy"] = world.rng.uniform(50.0, 100.0)
             agent = Agent(id=aid, x=x, y=y, traits=traits, stats=stats)
             world.add_agent(agent)
 
