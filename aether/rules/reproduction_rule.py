@@ -50,14 +50,29 @@ class ReproductionRule(Rule):
             child_stats = dict(DEFAULT_STATS)
             child_stats["energy"] = child_cost * 0.8
 
+            # Try to spawn child in a neighbor cell to avoid immediate combat
+            neighbors = world.get_neighbors(agent.x, agent.y)
+            if neighbors:
+                target_cell = world.rng.choice(neighbors)
+                cx, cy = target_cell.x, target_cell.y
+            else:
+                cx, cy = agent.x, agent.y
+
             child = Agent(
                 id=child_id,
-                x=agent.x,
-                y=agent.y,
+                x=cx,
+                y=cy,
                 traits=child_traits,
                 stats=child_stats,
             )
             new_agents.append(child)
+
+            if self.logger:
+                self.logger.log_event(
+                    tick,
+                    "birth",
+                    {"parent_id": agent.id, "child_id": child_id, "x": cx, "y": cy},
+                )
 
         for child in new_agents:
             world.add_agent(child)

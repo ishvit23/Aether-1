@@ -133,8 +133,11 @@ def decide(agent: Agent, observation: dict[str, Any], rng: random.Random) -> Act
         )
 
     # Priority 5: Reproduce if enough energy
+    from aether.utils.constants import DEFAULT_RULE_PARAMS
+
+    repro_threshold = DEFAULT_RULE_PARAMS["reproduction"].get("energy_threshold", 80.0)
     energy = stats.get("energy", 0.0)
-    if energy >= 80.0:
+    if energy >= repro_threshold:
         return Action(
             type=ActionType.REPRODUCE,
             actor_id=agent.id,
@@ -142,10 +145,14 @@ def decide(agent: Agent, observation: dict[str, Any], rng: random.Random) -> Act
             payload={},
         )
 
-    # Priority 6: Move toward resources or random walk
-    resource_cells = [c for c in observation.get("nearby_cells", []) if c.get("resources")]
-    if resource_cells:
-        target_cell = rng.choice(resource_cells)
+    # Priority 6: Move toward resources (prefer food if hungry)
+    nearby = observation.get("nearby_cells", [])
+    food_cells = [c for c in nearby if "food" in c.get("resources", {})]
+    resource_cells = [c for c in nearby if c.get("resources")]
+    
+    target_cells = food_cells if food_cells and hunger > 5.0 else resource_cells
+    if target_cells:
+        target_cell = rng.choice(target_cells)
         return Action(
             type=ActionType.MOVE,
             actor_id=agent.id,

@@ -33,8 +33,22 @@ class DeathRule(Rule):
 
         dead_ids: list[int] = []
         for agent in world.living_agents():
-            if agent.energy <= energy_floor or agent.health <= 0 or agent.age >= max_age:
+            reason = ""
+            if agent.energy <= energy_floor:
+                reason = "starvation"
+            elif agent.health <= 0:
+                reason = "combat"
+            elif agent.age >= max_age:
+                reason = "old_age"
+
+            if reason:
                 dead_ids.append(agent.id)
+                if self.logger:
+                    self.logger.log_event(
+                        tick,
+                        "death",
+                        {"agent_id": agent.id, "reason": reason, "age": agent.age},
+                    )
 
         for aid in dead_ids:
             world.remove_agent(aid)

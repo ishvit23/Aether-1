@@ -34,8 +34,9 @@ def run(config: str, seed: int | None, ticks: int | None, viz: str) -> None:
 @click.option("--log", required=True, help="Path to JSONL event log file.")
 def replay(log: str) -> None:
     """Replay a simulation from a JSONL event log."""
-    click.echo(f"Replay not yet implemented. Log file: {log}")
-    click.echo("This feature will be available in Milestone 7.")
+    from aether.viz.console_viz import replay_log
+
+    replay_log(log)
 
 
 @cli.command(name="validate-config")

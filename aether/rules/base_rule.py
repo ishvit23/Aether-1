@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from aether.world.world import World
+
+if TYPE_CHECKING:
+    from aether.utils.logger import EventLogger
 
 
 class Rule(ABC):
@@ -17,13 +20,16 @@ class Rule(ABC):
     Attributes:
         name: Unique rule identifier string.
         params: Configuration parameters for this rule.
+        logger: Optional event logger for rule-specific events.
     """
 
     name: str
     params: dict[str, Any]
+    logger: EventLogger | None
 
-    def __init__(self, params: dict[str, Any]) -> None:
+    def __init__(self, params: dict[str, Any], logger: EventLogger | None = None) -> None:
         self.params = params
+        self.logger = logger
 
     @abstractmethod
     def apply(self, world: World, tick: int) -> None:

@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from aether.rules.base_rule import Rule
 from aether.world.world import World
+
+if TYPE_CHECKING:
+    from aether.utils.logger import EventLogger
 
 
 class RuleEngine:
@@ -43,6 +46,7 @@ class RuleEngine:
         self,
         rules_order: list[str],
         rule_params: dict[str, dict[str, Any]],
+        logger: EventLogger | None = None,
     ) -> None:
         """Instantiate rules in the specified order with config params.
 
@@ -60,7 +64,7 @@ class RuleEngine:
                     f"Rule '{name}' not found in registry. Available: {list(self._registry.keys())}"
                 )
             params = rule_params.get(name, {})
-            rule_instance = self._registry[name](params)
+            rule_instance = self._registry[name](params, logger=logger)
             self.rules.append(rule_instance)
 
     def apply_all(self, world: World, tick: int) -> None:
