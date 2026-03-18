@@ -38,8 +38,19 @@ def execute_reproduce(
     if parent.energy < child_cost:
         return {"success": False, "reason": "insufficient_energy"}
 
+    # Population cap (matches reproduction rule)
+    if world.population_size() >= 80:
+        return {"success": False, "reason": "population_cap"}
+
+    # Cooldown check
+    last_repro = parent.stats.get("last_repro_tick", -999.0)
+    current_tick = world.tick
+    if current_tick - last_repro < 30:
+        return {"success": False, "reason": "cooldown"}
+
     # Deduct cost from parent
     parent.energy -= child_cost
+    parent.stats["last_repro_tick"] = float(current_tick)
 
     # Create child
     child_id = world.next_agent_id()

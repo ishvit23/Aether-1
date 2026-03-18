@@ -56,7 +56,6 @@ class TestRuleEngine:
             "collect",
             "combat",
             "trade",
-            "reproduction",
             "mutation",
             "death",
         ]

@@ -86,7 +86,6 @@ def register_all_rules() -> None:
     from aether.rules.hunger_rule import HungerRule
     from aether.rules.movement_rule import MovementRule
     from aether.rules.mutation_rule import MutationRule
-    from aether.rules.reproduction_rule import ReproductionRule
     from aether.rules.resource_rule import ResourceSpawnRule
     from aether.rules.trade_rule import TradeRule
 
@@ -96,6 +95,5 @@ def register_all_rules() -> None:
     RuleEngine.register("collect", CollectRule)
     RuleEngine.register("combat", CombatRule)
     RuleEngine.register("trade", TradeRule)
-    RuleEngine.register("reproduction", ReproductionRule)
     RuleEngine.register("mutation", MutationRule)
     RuleEngine.register("death", DeathRule)

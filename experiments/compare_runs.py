@@ -1,44 +1,109 @@
-"""Metric comparison utility for Aether-1 runs."""
+"""Metric comparison utility for Aether-1 runs.
+
+Compares multiple simulation metrics CSVs side-by-side.
+
+Usage:
+    uv run python experiments/compare_runs.py run1.csv run2.csv run3.csv
+    uv run python experiments/compare_runs.py run1.csv run2.csv --metric avg_energy
+"""
 
 import argparse
-import pandas as pd
+import csv
 import sys
 
+
+def load_metrics(path: str) -> list[dict]:
+    """Load metrics from a CSV file."""
+    with open(path) as f:
+        return list(csv.DictReader(f))
+
+
+def analyze(rows: list[dict], metric: str) -> dict:
+    """Compute summary statistics for a metric column."""
+    values = [float(r[metric]) for r in rows if metric in r]
+    if not values:
+        return {"final": 0, "max": 0, "min": 0, "avg": 0, "ticks": 0}
+
+    pops = [int(r["population"]) for r in rows]
+    extinction = None
+    for r in rows:
+        if int(r["population"]) == 0:
+            extinction = int(r["tick"])
+            break
+
+    return {
+        "final": values[-1],
+        "max": max(values),
+        "min": min(values),
+        "avg": round(sum(values) / len(values), 2),
+        "ticks": int(rows[-1]["tick"]) if rows else 0,
+        "peak_pop": max(pops),
+        "final_pop": pops[-1] if pops else 0,
+        "extinction_tick": extinction,
+    }
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Compare two Aether-1 metrics files")
-    parser.add_argument("file1", help="First metrics CSV")
-    parser.add_argument("file2", help="Second metrics CSV")
+    parser = argparse.ArgumentParser(description="Compare Aether-1 metrics files")
+    parser.add_argument("files", nargs="+", help="Metrics CSV files to compare")
     parser.add_argument("--metric", default="population", help="Metric to compare")
     args = parser.parse_args()
 
-    try:
-        df1 = pd.read_csv(args.file1)
-        df2 = pd.read_csv(args.file2)
-    except Exception as e:
-        print(f"Error reading files: {e}")
+    if len(args.files) < 1:
+        print("Provide at least one file.")
         sys.exit(1)
 
-    if args.metric not in df1.columns:
-        print(f"Error: Metric '{args.metric}' not found in {args.file1}")
-        sys.exit(1)
+    results = []
+    for path in args.files:
+        try:
+            rows = load_metrics(path)
+            stats = analyze(rows, args.metric)
+            results.append((path, stats))
+        except FileNotFoundError:
+            print(f"File not found: {path}")
+            sys.exit(1)
 
-    m1_final = df1[args.metric].iloc[-1]
-    m2_final = df2[args.metric].iloc[-1]
-    
-    m1_max = df1[args.metric].max()
-    m2_max = df2[args.metric].max()
+    # Print comparison table
+    print(f"\nComparison of '{args.metric}' across {len(results)} runs:")
+    print("=" * 80)
 
-    print(f"Comparison of '{args.metric}':")
-    print(f"{'Metric':<10} | {'File 1':<15} | {'File 2':<15} | {'Diff':<10}")
-    print("-" * 60)
-    print(f"{'Final':<10} | {m1_final:<15.2f} | {m2_final:<15.2f} | {m2_final-m1_final:<10.2f}")
-    print(f"{'Max':<10} | {m1_max:<15.2f} | {m2_max:<15.2f} | {m2_max-m1_max:<10.2f}")
+    # Header
+    labels = [f"File {i + 1}" for i in range(len(results))]
+    header = f"{'Stat':<20}" + "".join(f" | {label:<15}" for label in labels)
+    print(header)
+    print("-" * 80)
 
-    # Check for duration
-    t1 = df1['tick'].max()
-    t2 = df2['tick'].max()
-    print(f"\nSimulation Duration (Ticks):")
-    print(f"File 1: {t1} | File 2: {t2} | Diff: {t2-t1}")
+    # Rows
+    metrics = [
+        ("Final", "final"),
+        ("Max", "max"),
+        ("Min", "min"),
+        ("Average", "avg"),
+        ("Ticks", "ticks"),
+        ("Peak Population", "peak_pop"),
+        ("Final Population", "final_pop"),
+        ("Extinction Tick", "extinction_tick"),
+    ]
+
+    for label, key in metrics:
+        row = f"{label:<20}"
+        for _, stats in results:
+            val = stats.get(key)
+            if val is None:
+                row += f" | {'survived':<15}"
+            elif isinstance(val, float):
+                row += f" | {val:<15.2f}"
+            else:
+                row += f" | {val:<15}"
+        print(row)
+
+    print("=" * 80)
+
+    # File paths
+    print("\nFiles:")
+    for i, (path, _) in enumerate(results):
+        print(f"  File {i + 1}: {path}")
+
 
 if __name__ == "__main__":
     main()

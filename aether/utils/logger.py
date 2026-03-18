@@ -149,10 +149,7 @@ def write_run_metadata(
         "config_hash": config_hash,
         "git_commit": git_commit,
         "started_at": datetime.now(tz=UTC).isoformat(),
-        "python": (
-            f"{sys.version_info.major}.{sys.version_info.minor}."
-            f"{sys.version_info.micro}"
-        ),
+        "python": (f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"),
         "aether_version": "0.1.0",
     }
 

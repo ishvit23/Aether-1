@@ -120,8 +120,8 @@ class TickEngine:
             agent = self.world.agents.get(actor_id)
             if agent is not None:
                 resource = payload.get("resource", "food")
-                eaten = inv_remove(agent.inventory, resource, 5.0)
-                agent.energy = min(100.0, agent.energy + eaten * 10.0)
+                eaten = inv_remove(agent.inventory, resource, 10.0)
+                agent.energy = min(100.0, agent.energy + eaten * 8.0)
                 agent.hunger = max(0.0, agent.hunger - eaten * 5.0)
                 result = {"agent_id": actor_id, "ate": resource, "amount": eaten}
 
