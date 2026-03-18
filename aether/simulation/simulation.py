@@ -85,7 +85,7 @@ class Simulation:
 
     def run(self) -> None:
         """Execute the full simulation."""
-        render_cb = None
+        render_cb: Any | None = None
         if self.viz == "console":
             render_cb = render_console
         elif self.viz == "pygame":
