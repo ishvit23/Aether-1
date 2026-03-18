@@ -91,17 +91,13 @@ def run_single_sim(config_path: str, seed: int, ticks: int, overrides: dict | No
 
         # Find the most recent metrics CSV
         log_dir = "logs"
-        csv_files = sorted(
-            [f for f in os.listdir(log_dir) if f.startswith("metrics_")],
-            reverse=True,
-        )
+        csv_path = os.path.join(log_dir, "latest_metrics.csv")
 
         final_pop = 0
         extinction_tick = None
         max_pop = 0
 
-        if csv_files:
-            csv_path = os.path.join(log_dir, csv_files[0])
+        if os.path.exists(csv_path):
             with open(csv_path) as cf:
                 reader = csv.DictReader(cf)
                 for row in reader:
