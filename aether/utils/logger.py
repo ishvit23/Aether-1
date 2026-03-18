@@ -40,8 +40,7 @@ class EventLogger:
     def __init__(self, log_dir: str = "logs") -> None:
         self.log_dir = Path(log_dir)
         self.log_dir.mkdir(parents=True, exist_ok=True)
-        timestamp = datetime.now(tz=UTC).strftime("%Y%m%d_%H%M%S")
-        self.log_path = self.log_dir / f"run_{timestamp}.jsonl"
+        self.log_path = self.log_dir / "latest_run.jsonl"
         self._file = open(self.log_path, "w", encoding="utf-8")  # noqa: SIM115
 
     def log_event(self, tick: int, event_type: str, payload: dict[str, Any]) -> None:
@@ -83,8 +82,7 @@ class MetricsWriter:
     def __init__(self, log_dir: str = "logs") -> None:
         log_path = Path(log_dir)
         log_path.mkdir(parents=True, exist_ok=True)
-        timestamp = datetime.now(tz=UTC).strftime("%Y%m%d_%H%M%S")
-        self.csv_path = log_path / f"metrics_{timestamp}.csv"
+        self.csv_path = log_path / "latest_metrics.csv"
         self._file = open(self.csv_path, "w", newline="", encoding="utf-8")  # noqa: SIM115
         self._writer = csv.writer(self._file)
         self._writer.writerow(self.COLUMNS)
@@ -121,8 +119,7 @@ def write_run_metadata(
     """
     log_path = Path(log_dir)
     log_path.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now(tz=UTC).strftime("%Y%m%d_%H%M%S")
-    meta_path = log_path / f"run_{timestamp}_meta.json"
+    meta_path = log_path / "latest_meta.json"
 
     # Config hash
     config_hash = ""
