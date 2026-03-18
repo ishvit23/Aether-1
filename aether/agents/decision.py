@@ -88,9 +88,10 @@ def decide(agent: Agent, observation: dict[str, Any], rng: random.Random) -> Act
     current_cell = observation["current_cell"]
     nearby_agents = observation["nearby_agents"]
 
-    # Priority 1: Eat if hungry and has food
+    # Priority 1: Eat if hungry or low on energy and has food
     hunger = stats.get("hunger", 0.0)
-    if hunger > 20.0 and has_resource(agent.inventory, "food"):
+    energy = stats.get("energy", 0.0)
+    if (hunger > 5.0 or energy < 40.0) and has_resource(agent.inventory, "food"):
         return Action(
             type=ActionType.EAT,
             actor_id=agent.id,
@@ -132,12 +133,12 @@ def decide(agent: Agent, observation: dict[str, Any], rng: random.Random) -> Act
             payload={"offer_resource": offer_resource, "offer_amount": 1.0},
         )
 
-    # Priority 5: Reproduce if enough energy
+    # Priority 5: Reproduce if enough energy and old enough (prevent tick-0 boom)
     from aether.utils.constants import DEFAULT_RULE_PARAMS
 
-    repro_threshold = DEFAULT_RULE_PARAMS["reproduction"].get("energy_threshold", 80.0)
-    energy = stats.get("energy", 0.0)
-    if energy >= repro_threshold:
+    repro_threshold = DEFAULT_RULE_PARAMS["reproduction"].get("energy_threshold", 60.0)
+    age = stats.get("age", 0.0)
+    if energy >= repro_threshold and age >= 20.0:
         return Action(
             type=ActionType.REPRODUCE,
             actor_id=agent.id,
@@ -149,7 +150,7 @@ def decide(agent: Agent, observation: dict[str, Any], rng: random.Random) -> Act
     nearby = observation.get("nearby_cells", [])
     food_cells = [c for c in nearby if "food" in c.get("resources", {})]
     resource_cells = [c for c in nearby if c.get("resources")]
-    
+
     target_cells = food_cells if food_cells and hunger > 5.0 else resource_cells
     if target_cells:
         target_cell = rng.choice(target_cells)

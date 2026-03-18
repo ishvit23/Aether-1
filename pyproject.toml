@@ -31,6 +31,23 @@ markers = [
     "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
 ]
 
+[tool.coverage.run]
+source = ["aether"]
+omit = [
+    "aether/viz/*",
+    "aether/simulation/*",
+    "aether/utils/logger.py",
+    "aether/world/world_loader.py",
+    "aether/resources/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+]
+
 [dependency-groups]
 dev = [
     "pytest>=8.0",

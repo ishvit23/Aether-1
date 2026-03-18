@@ -88,6 +88,10 @@ class Simulation:
         render_cb = None
         if self.viz == "console":
             render_cb = render_console
+        elif self.viz == "pygame":
+            from aether.viz.pygame_viz import render_pygame
+
+            render_cb = render_pygame
 
         try:
             self.engine.run(render_callback=render_cb, render_interval=10)

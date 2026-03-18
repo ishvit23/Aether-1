@@ -1,0 +1,23 @@
+{
+  "world": { "width": 30, "height": 30, "wrap": true },
+  "initial": {
+    "agents": 40,
+    "resource_distribution": { "food": 0.005, "material": 0.005 }
+  },
+  "rules_order": [
+    "hunger", "movement", "resource_spawn", "collect",
+    "combat", "mutation", "death"
+  ],
+  "rule_params": {
+    "hunger":       { "decay_rate": 0.8, "critical_threshold": 25.0 },
+    "movement":     { "max_steps": 2.0, "energy_cost": 0.8, "goal_bias": 0.2 },
+    "resource_spawn": { "spawn_interval": 2, "spawn_prob": 0.06, "amount": 8.0 },
+    "collect":      { "max_per_tick": 8.0, "capacity": 30.0 },
+    "combat":       { "range": 1, "damage_multiplier": 8.0, "flee_threshold": 10.0 },
+    "reproduction": { "energy_threshold": 70.0, "child_cost": 35.0, "min_repro_age": 25.0, "repro_cooldown": 40.0, "max_population": 60.0 },
+    "mutation":     { "rate": 0.1, "max_delta": 0.2 },
+    "death":        { "energy_floor": 0.0, "max_age": 300.0 }
+  },
+  "ticks": 1000,
+  "seed": 42
+}
