@@ -108,7 +108,7 @@ tests/              # Robust 60+ assertion test suite matching strict metrics
 ### Setup Hooks & Dependencies
 Ensure you have the development layer installed to run local checks.
 ```bash
-uv sync --extra dev
+uv sync
 pre-commit install
 ```
 
