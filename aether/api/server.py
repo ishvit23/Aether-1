@@ -83,7 +83,7 @@ async def websocket_simulate(websocket: WebSocket, config: str = "world_v1.json"
     state = {"paused": False, "step": False, "delay": 0.05}
 
     # Background task to listen for control messages from the client
-    async def listen_for_commands():
+    async def listen_for_commands() -> None:
         try:
             while True:
                 data = await websocket.receive_text()

@@ -35,7 +35,7 @@ class WSRenderer:
             agents.append(self._serialize_agent(agent))
 
         # Basic distribution for pie charts
-        factions = {}
+        factions: dict[str, int] = {}
         for a in self.world.living_agents():
             fid = a.faction_id or "None"
             factions[fid] = factions.get(fid, 0) + 1
