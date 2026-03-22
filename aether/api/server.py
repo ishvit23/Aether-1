@@ -1,4 +1,3 @@
-
 """FastAPI server for the Aether-1 Web Dashboard.
 
 Provides routes for listing scenarios and a WebSocket for live simulation streaming.
