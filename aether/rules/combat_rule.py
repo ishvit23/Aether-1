@@ -42,19 +42,65 @@ class CombatRule(Rule):
                         if not a.is_alive() or not b.is_alive():
                             continue
 
+                        if a.faction_id and a.faction_id == b.faction_id:
+                            continue
+
                         # Combat happens if either agent is aggressive
                         aggr_a = a.traits.get("aggression", 0.0)
                         aggr_b = b.traits.get("aggression", 0.0)
 
                         if world.rng.random() < max(aggr_a, aggr_b) * 0.3:
+                            # Group combat logic: allies in the same cell provide a multiplier
+                            allies_a = (
+                                sum(
+                                    1
+                                    for cid in cell.agents
+                                    if world.agents.get(cid)
+                                    and world.agents[cid].is_alive()
+                                    and world.agents[cid].faction_id == a.faction_id
+                                )
+                                if a.faction_id
+                                else 1
+                            )
+                            allies_b = (
+                                sum(
+                                    1
+                                    for cid in cell.agents
+                                    if world.agents.get(cid)
+                                    and world.agents[cid].is_alive()
+                                    and world.agents[cid].faction_id == b.faction_id
+                                )
+                                if b.faction_id
+                                else 1
+                            )
+
                             # Resolve combat based on strength
                             str_a = a.traits.get("strength", 0.5)
                             str_b = b.traits.get("strength", 0.5)
 
-                            dmg_to_b = str_a * damage_mult * world.rng.uniform(0.5, 1.5)
-                            dmg_to_a = str_b * damage_mult * world.rng.uniform(0.5, 1.5)
+                            dmg_to_b = (
+                                str_a
+                                * damage_mult
+                                * world.rng.uniform(0.5, 1.5)
+                                * (1.0 + (allies_a - 1) * 0.5)
+                            )
+                            dmg_to_a = (
+                                str_b
+                                * damage_mult
+                                * world.rng.uniform(0.5, 1.5)
+                                * (1.0 + (allies_b - 1) * 0.5)
+                            )
 
                             b.health = max(0.0, b.health - dmg_to_b)
                             a.health = max(0.0, a.health - dmg_to_a)
                             a.energy = max(0.0, a.energy - 3.0)
                             b.energy = max(0.0, b.energy - 3.0)
+
+                            if dmg_to_b > 0:
+                                b.add_memory(
+                                    {"tick": tick, "agent_id": a.id, "type": "attacked_by"}
+                                )
+                            if dmg_to_a > 0:
+                                a.add_memory(
+                                    {"tick": tick, "agent_id": b.id, "type": "attacked_by"}
+                                )

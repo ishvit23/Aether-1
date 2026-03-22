@@ -39,7 +39,7 @@ def execute_reproduce(
         return {"success": False, "reason": "insufficient_energy"}
 
     # Population cap (matches reproduction rule)
-    if world.population_size() >= 80:
+    if world.population_size() >= 150:
         return {"success": False, "reason": "population_cap"}
 
     # Cooldown check
@@ -63,12 +63,17 @@ def execute_reproduce(
     child_stats = dict(DEFAULT_STATS)
     child_stats["energy"] = child_cost * 0.8  # child starts with portion of cost
 
+    # Inherit recent memories from parent (knowledge transfer)
+    inherited_memory = list(parent.memory[:5]) if parent.memory else []
+
     child = Agent(
         id=child_id,
         x=parent.x,
         y=parent.y,
         traits=child_traits,
         stats=child_stats,
+        faction_id=parent.faction_id,
+        memory=inherited_memory,
     )
     world.add_agent(child)
 

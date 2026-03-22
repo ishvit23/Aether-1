@@ -79,7 +79,7 @@ class TestReproduceAction:
     def test_population_cap(self):
         world = World(width=10, height=10, seed=42)
         # Fill world to cap
-        for i in range(80):
+        for i in range(150):
             stats = dict(DEFAULT_STATS)
             stats["energy"] = 100.0
             agent = Agent(id=i, x=i % 10, y=i // 10, stats=stats)

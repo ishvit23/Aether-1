@@ -40,6 +40,8 @@ class World:
         self.agents: dict[int, Agent] = {}
         self.rng: random.Random = random.Random(seed)
         self._next_agent_id: int = 0
+        self.weather_state: str = "Spring"
+        self.global_temperature: float = 20.0
 
         # Build grid
         self.grid: list[list[Cell]] = [

@@ -32,6 +32,7 @@ class Agent:
     inventory: dict[str, float] = field(default_factory=dict)
     state: str = "idle"
     memory: list[Any] = field(default_factory=list)
+    faction_id: str | None = None
 
     @property
     def energy(self) -> float:
@@ -76,3 +77,14 @@ class Agent:
             True if energy > 0 and health > 0.
         """
         return self.energy > 0 and self.health > 0
+
+    def add_memory(self, event: dict[str, Any], max_memories: int = 50) -> None:
+        """Add an event to the agent's memory, maintaining a bounded capacity.
+
+        Args:
+            event: A dictionary containing event details (e.g., tick, type, agent_id).
+            max_memories: The maximum number of events to retain in memory.
+        """
+        self.memory.insert(0, event)
+        if len(self.memory) > max_memories:
+            self.memory.pop()

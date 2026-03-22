@@ -25,6 +25,11 @@ class HungerRule(Rule):
         """
         decay_rate = self.params.get("decay_rate", 1.0)
 
+        if world.weather_state == "Winter":
+            decay_rate *= 2.0
+        elif world.weather_state == "Summer":
+            decay_rate *= 1.2
+
         for agent in world.living_agents():
             agent.energy = max(0.0, agent.energy - decay_rate)
             agent.hunger = agent.hunger + decay_rate * 0.5
