@@ -22,6 +22,7 @@ class Cell:
     resources: dict[str, float] = field(default_factory=dict)
     agents: list[int] = field(default_factory=list)
     terrain: str | None = None
+    structure: str | None = None
 
     def add_resource(self, name: str, amount: float) -> None:
         """Add a quantity of a resource to this cell.

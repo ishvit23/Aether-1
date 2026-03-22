@@ -31,6 +31,15 @@ class ResourceSpawnRule(Rule):
         spawn_prob = self.params.get("spawn_prob", 0.02)
         amount = self.params.get("amount", 5.0)
 
+        if world.weather_state == "Winter":
+            spawn_prob *= 0.1
+            amount *= 0.2
+        elif world.weather_state == "Summer":
+            spawn_prob *= 1.5
+            amount *= 1.5
+        elif world.weather_state == "Autumn":
+            spawn_prob *= 0.8
+
         for row in world.grid:
             for cell in row:
                 if world.rng.random() < spawn_prob:

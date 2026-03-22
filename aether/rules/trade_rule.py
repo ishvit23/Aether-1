@@ -47,12 +47,17 @@ class TradeRule(Rule):
                         coop_b = b.traits.get("cooperation", 0.5)
                         trade_prob = acceptance_base * (coop_a + coop_b) / 2.0
 
+                        local_offer_threshold = offer_threshold
+                        if a.faction_id and a.faction_id == b.faction_id:
+                            trade_prob = 1.0  # Faction members always trade
+                            local_offer_threshold = 1.0  # Much lower threshold to share resources
+
                         if world.rng.random() > trade_prob:
                             continue
 
                         # Find resources A has that B wants, and vice versa
                         for res_a in list(a.inventory.keys()):
-                            if not has_resource(a.inventory, res_a, offer_threshold):
+                            if not has_resource(a.inventory, res_a, local_offer_threshold):
                                 continue
                             for res_b in list(b.inventory.keys()):
                                 if res_b == res_a:
@@ -64,7 +69,7 @@ class TradeRule(Rule):
                                 amount = min(
                                     a.inventory.get(res_a, 0.0) * 0.2,
                                     b.inventory.get(res_b, 0.0) * 0.2,
-                                    offer_threshold,
+                                    local_offer_threshold,
                                 )
                                 if amount <= 0:
                                     continue
@@ -73,4 +78,21 @@ class TradeRule(Rule):
                                 removed_b = remove_resource(b.inventory, res_b, amount)
                                 add_resource(b.inventory, res_a, removed_a)
                                 add_resource(a.inventory, res_b, removed_b)
+
+                                a.add_memory(
+                                    {
+                                        "tick": tick,
+                                        "agent_id": b.id,
+                                        "type": "successful_trade",
+                                        "amount": amount,
+                                    }
+                                )
+                                b.add_memory(
+                                    {
+                                        "tick": tick,
+                                        "agent_id": a.id,
+                                        "type": "successful_trade",
+                                        "amount": amount,
+                                    }
+                                )
                                 return  # One trade per tick is enough

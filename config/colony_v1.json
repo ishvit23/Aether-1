@@ -6,15 +6,15 @@
   },
   "rules_order": [
     "hunger", "movement", "resource_spawn", "collect",
-    "trade", "mutation", "death"
+    "trade", "faction", "weather", "build", "mutation", "death"
   ],
   "rule_params": {
-    "hunger":       { "decay_rate": 0.4, "critical_threshold": 10.0 },
+    "hunger":       { "decay_rate": 0.6, "critical_threshold": 10.0 },
     "movement":     { "max_steps": 1.0, "energy_cost": 0.3, "goal_bias": 0.5 },
     "resource_spawn": { "spawn_interval": 1, "spawn_prob": 0.15, "amount": 15.0 },
     "collect":      { "max_per_tick": 12.0, "capacity": 60.0 },
     "trade":        { "offer_threshold": 3.0, "acceptance_prob_base": 0.7 },
-    "reproduction": { "energy_threshold": 50.0, "child_cost": 20.0, "min_repro_age": 15.0, "repro_cooldown": 25.0, "max_population": 120.0 },
+    "reproduction": { "energy_threshold": 50.0, "child_cost": 20.0, "min_repro_age": 15.0, "repro_cooldown": 25.0, "max_population": 150.0 },
     "mutation":     { "rate": 0.08, "max_delta": 0.15 },
     "death":        { "energy_floor": 0.0, "max_age": 600.0 }
   },

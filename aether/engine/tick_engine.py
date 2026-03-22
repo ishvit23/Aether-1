@@ -7,6 +7,7 @@ from typing import Any
 
 from aether.actions.action import Action, ActionType
 from aether.actions.attack_action import execute_attack
+from aether.actions.build_action import execute_build
 from aether.actions.collect_action import execute_collect
 from aether.actions.move_action import execute_move
 from aether.actions.reproduce_action import execute_reproduce
@@ -84,6 +85,8 @@ class TickEngine:
             return False
 
         if action["type"] == ActionType.ATTACK:
+            if "combat" not in [r.name for r in self.rule_engine.rules]:
+                return False
             target_id = action.get("target")
             if isinstance(target_id, int) and target_id not in self.world.agents:
                 return False
@@ -141,6 +144,10 @@ class TickEngine:
             result = execute_reproduce(actor_id, self.world)
             if result.get("success"):
                 self._tick_births += 1
+
+        elif action_type == ActionType.BUILD:
+            target_tuple = target if isinstance(target, tuple) else None
+            result = execute_build(actor_id, target_tuple, payload, self.world)
 
         elif action_type == ActionType.IDLE:
             result = {"agent_id": actor_id, "action": "idle"}

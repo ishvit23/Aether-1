@@ -80,20 +80,26 @@ class RuleEngine:
 
 def register_all_rules() -> None:
     """Register all built-in V1 rules with the RuleEngine."""
+    from aether.rules.build_rule import BuildRule
     from aether.rules.collect_rule import CollectRule
     from aether.rules.combat_rule import CombatRule
     from aether.rules.death_rule import DeathRule
+    from aether.rules.faction_rule import FactionRule
     from aether.rules.hunger_rule import HungerRule
     from aether.rules.movement_rule import MovementRule
     from aether.rules.mutation_rule import MutationRule
     from aether.rules.resource_rule import ResourceSpawnRule
     from aether.rules.trade_rule import TradeRule
+    from aether.rules.weather_rule import WeatherRule
 
     RuleEngine.register("hunger", HungerRule)
     RuleEngine.register("movement", MovementRule)
     RuleEngine.register("resource_spawn", ResourceSpawnRule)
+    RuleEngine.register("weather", WeatherRule)
+    RuleEngine.register("build", BuildRule)
     RuleEngine.register("collect", CollectRule)
     RuleEngine.register("combat", CombatRule)
     RuleEngine.register("trade", TradeRule)
+    RuleEngine.register("faction", FactionRule)
     RuleEngine.register("mutation", MutationRule)
     RuleEngine.register("death", DeathRule)

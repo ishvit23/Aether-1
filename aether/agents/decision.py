@@ -44,11 +44,14 @@ def observe(agent: Agent, world: World, radius: int = 2) -> dict[str, Any]:
         "self_stats": dict(agent.stats),
         "self_traits": dict(agent.traits),
         "self_inventory": dict(agent.inventory),
+        "memory": list(agent.memory),
+        "weather_state": getattr(world, "weather_state", "Spring"),
         "current_cell": {
             "x": current_cell.x,
             "y": current_cell.y,
             "resources": dict(current_cell.resources),
             "agent_count": current_cell.agent_count(),
+            "structure": current_cell.structure,
         },
         "nearby_cells": [
             {
@@ -56,6 +59,7 @@ def observe(agent: Agent, world: World, radius: int = 2) -> dict[str, Any]:
                 "y": c.y,
                 "resources": dict(c.resources),
                 "agent_count": c.agent_count(),
+                "structure": c.structure,
             }
             for c in neighbors
         ],
@@ -91,7 +95,11 @@ def decide(agent: Agent, observation: dict[str, Any], rng: random.Random) -> Act
     # Priority 1: Eat if hungry or low on energy and has food
     hunger = stats.get("hunger", 0.0)
     energy = stats.get("energy", 0.0)
-    if (hunger > 5.0 or energy < 40.0) and has_resource(agent.inventory, "food"):
+    weather_state = observation.get("weather_state", "Spring")
+
+    hunger_threshold = 10.0 if weather_state == "Autumn" else 5.0
+
+    if (hunger > hunger_threshold or energy < 40.0) and has_resource(agent.inventory, "food"):
         return Action(
             type=ActionType.EAT,
             actor_id=agent.id,
@@ -102,7 +110,10 @@ def decide(agent: Agent, observation: dict[str, Any], rng: random.Random) -> Act
     # Priority 2: Collect if resources on current cell
     cell_resources = current_cell.get("resources", {})
     if cell_resources:
-        best_resource = max(cell_resources, key=lambda r: cell_resources[r])
+        if weather_state == "Autumn" and "food" in cell_resources:
+            best_resource = "food"
+        else:
+            best_resource = max(cell_resources, key=lambda r: cell_resources[r])
         return Action(
             type=ActionType.COLLECT,
             actor_id=agent.id,
@@ -146,18 +157,75 @@ def decide(agent: Agent, observation: dict[str, Any], rng: random.Random) -> Act
             payload={},
         )
 
-    # Priority 6: Move toward resources (prefer food if hungry)
-    nearby = observation.get("nearby_cells", [])
-    food_cells = [c for c in nearby if "food" in c.get("resources", {})]
-    resource_cells = [c for c in nearby if c.get("resources")]
+    # Priority 5.5: Build structures if enough material
+    material = agent.inventory.get("material", 0.0)
+    if material >= 20.0:
+        if weather_state in ["Autumn", "Winter"] and current_cell.get("structure") is None:
+            return Action(
+                type=ActionType.BUILD,
+                actor_id=agent.id,
+                target=(current_cell["x"], current_cell["y"]),
+                payload={"structure_type": "nest"},
+            )
 
-    target_cells = food_cells if food_cells and hunger > 5.0 else resource_cells
-    if target_cells:
-        target_cell = rng.choice(target_cells)
+        aggression = traits.get("aggression", 0.0)
+        if aggression > 0.6 and material >= 15.0:
+            empty_spots = [
+                c
+                for c in observation.get("nearby_cells", [])
+                if c.get("structure") is None and c.get("agent_count", 0) == 0
+            ]
+            if empty_spots:
+                target_cell = rng.choice(empty_spots)
+                return Action(
+                    type=ActionType.BUILD,
+                    actor_id=agent.id,
+                    target=(target_cell["x"], target_cell["y"]),
+                    payload={"structure_type": "wall"},
+                )
+
+    # Priority 6: Move using scored heuristics (resources, memory of friends/foes)
+    nearby = observation.get("nearby_cells", [])
+    memory = observation.get("memory", [])
+    feared_agents = {m["agent_id"] for m in memory if m.get("type") == "attacked_by"}
+    trusted_agents = {m["agent_id"] for m in memory if m.get("type") == "successful_trade"}
+
+    best_move = None
+    best_score = -999.0
+
+    for c in nearby:
+        if c.get("structure") == "wall":
+            continue
+
+        score = 0.0
+        # Resource scoring
+        if "food" in c.get("resources", {}) and (
+            hunger > hunger_threshold or weather_state == "Autumn"
+        ):
+            score += 10.0
+        elif c.get("resources"):
+            score += 5.0
+
+        # Memory scoring (agents in the candidate cell)
+        c_agents = [a for a in nearby_agents if a["x"] == c["x"] and a["y"] == c["y"]]
+        for ca in c_agents:
+            if ca["id"] in feared_agents:
+                score -= 50.0  # heavily avoid attackers
+            if ca["id"] in trusted_agents:
+                score += 20.0  # seek traders
+
+        # Tiny random fuzzing to break ties
+        score += rng.uniform(0, 0.5)
+
+        if score > best_score:
+            best_score = score
+            best_move = (c["x"], c["y"])
+
+    if best_score > -40.0 and best_move:
         return Action(
             type=ActionType.MOVE,
             actor_id=agent.id,
-            target=(target_cell["x"], target_cell["y"]),
+            target=best_move,
             payload={},
         )
 
