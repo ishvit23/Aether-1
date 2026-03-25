@@ -6,6 +6,25 @@ from dataclasses import dataclass, field
 
 
 @dataclass
+class StructureData:
+    """Represents a structure placed on a cell.
+
+    Attributes:
+        kind: Structure type — 'wall' or 'nest'.
+        health: Durability points. Structure is destroyed when <= 0.
+        faction_id: The faction that owns this structure (None = neutral).
+    """
+
+    kind: str  # "wall" | "nest"
+    health: float = 100.0
+    faction_id: str | None = None
+
+    def is_destroyed(self) -> bool:
+        """Return True if this structure has been fully damaged."""
+        return self.health <= 0.0
+
+
+@dataclass
 class Cell:
     """A single cell in the world grid.
 
@@ -22,7 +41,12 @@ class Cell:
     resources: dict[str, float] = field(default_factory=dict)
     agents: list[int] = field(default_factory=list)
     terrain: str | None = None
-    structure: str | None = None
+    structure: StructureData | None = None
+
+    @property
+    def structure_kind(self) -> str | None:
+        """Convenience accessor for the structure type string."""
+        return self.structure.kind if self.structure else None
 
     def add_resource(self, name: str, amount: float) -> None:
         """Add a quantity of a resource to this cell.

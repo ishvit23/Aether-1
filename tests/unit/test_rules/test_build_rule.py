@@ -23,7 +23,9 @@ def agent(world):
 def test_nest_healing_effect(world, agent):
     # Setup a nest at (5, 5)
     cell = world.get_cell(5, 5)
-    cell.structure = "nest"
+    from aether.world.cell import StructureData
+
+    cell.structure = StructureData(kind="nest")
 
     agent.energy = 50.0
 
@@ -37,7 +39,9 @@ def test_nest_healing_effect(world, agent):
 def test_nest_healing_adjacent(world, agent):
     # Setup a nest adjacent at (6, 5)
     cell = world.get_cell(6, 5)
-    cell.structure = "nest"
+    from aether.world.cell import StructureData
+
+    cell.structure = StructureData(kind="nest")
 
     agent.energy = 80.0
 
@@ -60,7 +64,8 @@ def test_build_action_costs_and_validation(world, agent):
     result = execute_build(agent.id, (5, 6), {"structure_type": "wall"}, world)
     assert result["success"]
     assert agent.inventory["material"] == 5.0
-    assert world.get_cell(5, 6).structure == "wall"
+    assert world.get_cell(5, 6).structure is not None
+    assert world.get_cell(5, 6).structure.kind == "wall"
 
     # Cell already occupied by a structure
     agent.inventory["material"] = 50.0

@@ -16,6 +16,7 @@ class ActionType(StrEnum):
     TRADE = "trade"
     REPRODUCE = "reproduce"
     BUILD = "build"
+    HUNT = "hunt"
     IDLE = "idle"
 
 

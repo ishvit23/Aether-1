@@ -68,14 +68,20 @@ const Renderer: React.FC<RendererProps> = ({ state }) => {
         const py = cell.y * CELL_SIZE;
 
         // Draw Structure
-        if (cell.structure === 'wall') {
-          ctx.fillStyle = '#444';
-          ctx.fillRect(px + 1, py + 1, CELL_SIZE - 2, CELL_SIZE - 2);
-        } else if (cell.structure === 'nest') {
-          ctx.fillStyle = '#665511';
-          ctx.fillRect(px + 2, py + 2, CELL_SIZE - 4, CELL_SIZE - 4);
-          ctx.strokeStyle = '#cc9900';
-          ctx.strokeRect(px + 2, py + 2, CELL_SIZE - 4, CELL_SIZE - 4);
+        if (cell.structure) {
+          const kind = cell.structure.kind || cell.structure; 
+          const health = cell.structure.health !== undefined ? cell.structure.health : 100;
+          const alpha = Math.max(0.2, health / 100.0); // fade out as health drops
+
+          if (kind === 'wall') {
+            ctx.fillStyle = `rgba(100, 100, 100, ${alpha.toFixed(2)})`;
+            ctx.fillRect(px + 1, py + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+          } else if (kind === 'nest') {
+            ctx.fillStyle = `rgba(102, 85, 17, ${alpha.toFixed(2)})`;
+            ctx.fillRect(px + 2, py + 2, CELL_SIZE - 4, CELL_SIZE - 4);
+            ctx.strokeStyle = `rgba(204, 153, 0, ${alpha.toFixed(2)})`;
+            ctx.strokeRect(px + 2, py + 2, CELL_SIZE - 4, CELL_SIZE - 4);
+          }
         }
 
         // Draw Resources (subtle green for food)
@@ -107,6 +113,24 @@ const Renderer: React.FC<RendererProps> = ({ state }) => {
           ctx.strokeStyle = '#fff';
           ctx.lineWidth = 2;
           ctx.stroke();
+        }
+      });
+    }
+
+    // Draw Animals
+    if (state.animals) {
+      state.animals.forEach((animal: any) => {
+        const px = animal.x * CELL_SIZE + CELL_SIZE / 2;
+        const py = animal.y * CELL_SIZE + CELL_SIZE / 2;
+
+        ctx.font = `${CELL_SIZE - 2}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        
+        if (animal.kind === 'rabbit') {
+          ctx.fillText("🐇", px, py);
+        } else if (animal.kind === 'wolf') {
+          ctx.fillText("🐺", px, py);
         }
       });
     }

@@ -24,10 +24,11 @@ Powered by priority-based decision logic and an entirely decoupled rule engine, 
 
 ## ✨ Key Features
 
-*   **🧬 High-Fidelity Agent Models:** Agents possess nuanced statistics (health, energy, hunger, age) and fully mutable genetic traits (speed, strength, intelligence, aggression, greed, cooperation). 
-*   **🌍 Deterministic Torus World:** The grid strictly adheres to seeded pseudorandom number generation to ensure 100% determinism. A torus wrapping matrix prevents boundary-clipping effects.
+*   **🧬 High-Fidelity Agent Models:** Agents possess nuanced statistics and fully mutable genetic traits. 
+*   **🧠 Tabular Q-Learning (Epsilon-Greedy):** Intelligent agents natively map states logic arrays across dynamic lifetimes, retaining generational success via *Fuzzy Lamarckian Inheritance*.
+*   **🌍 Deterministic Torus World:** The grid strictly adheres to seeded pseudorandom number generation to ensure 100% determinism across 40,000 tile geographies (Titan Scale).
+*   **🐺 Multi-Tier Artificial Ecology:** The maps populate natively with unscripted Prey (Rabbits) and Predators (Wolves) supporting complex hunting dependencies and seasonal shelter siege loops.
 *   **⚙️ Uncoupled Rule Engine:** The game loop is completely data-driven. Rules like `hunger`, `combat`, `trade`, and `mutation` are decoupled classes injected into the simulation sequentially. 
-*   **📊 Rich CLI & Metrics:** Experience beautiful console dashboards natively powered by `rich`. Automatically dump JSONL event structures and CSV metric checkpoints during execution. 
 *   **🏎️ Production Ready Codebase:** Heavily sanitized using modern tooling: `uv` package management, `ruff` auto-linting, `mypy --strict` typings, and sprawling `pytest` suites.
 
 ---
@@ -135,3 +136,5 @@ uv run ruff check .
 - [x] **Milestone 6:** Evolution (Reproduction, Mutation)
 - [x] **Milestone 7:** Advanced Logging, Diagnostic Replays & Experiments
 - [x] **Milestone 8:** Containerization (Docker) & Final Documentation
+- [x] **Milestone 9 (V4):** Learning Agents, Multi-Tier Ecology (Animals), Structure Sieging, and Titan-Scale Performance
+- [ ] **Milestone 10 (V5):** Language Model World Generation and HTML5 2D Pixel Art Overhaul

@@ -38,6 +38,8 @@ class Simulation:
         seed: int | None = None,
         ticks: int | None = None,
         viz: str = "none",
+        metrics_dir: str | None = "default",
+        policy: dict[str, dict[str, float]] | None = None,
     ) -> None:
         setup_console_logging()
 
@@ -56,12 +58,22 @@ class Simulation:
 
         # Build world
         self.world = WorldLoader.build_world(self.config)
+        
+        # Inject policy
+        if policy is not None:
+            import copy
+            for agent in self.world.agents.values():
+                agent.q_table = copy.deepcopy(policy)
 
         # Set up logging
-        self.event_logger = EventLogger()
-        self.metrics_writer = MetricsWriter()
-        actual_seed = self.config.get("seed", 42)
-        write_run_metadata(actual_seed, config_path)
+        self.event_logger: EventLogger | None = None
+        self.metrics_writer: MetricsWriter | None = None
+        
+        if metrics_dir is not None:
+            self.event_logger = EventLogger()
+            self.metrics_writer = MetricsWriter()
+            actual_seed = self.config.get("seed", 42)
+            write_run_metadata(actual_seed, config_path)
 
         # Set up rules
         register_all_rules()
@@ -96,7 +108,9 @@ class Simulation:
         try:
             self.engine.run(render_callback=render_cb, render_interval=10)
         finally:
-            self.event_logger.close()
-            self.metrics_writer.close()
-            logger.info("Event log: %s", self.event_logger.log_path)
-            logger.info("Metrics CSV: %s", self.metrics_writer.csv_path)
+            if self.event_logger is not None:
+                self.event_logger.close()
+                logger.info("Event log: %s", self.event_logger.log_path)
+            if self.metrics_writer is not None:
+                self.metrics_writer.close()
+                logger.info("Metrics CSV: %s", self.metrics_writer.csv_path)

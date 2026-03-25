@@ -24,7 +24,7 @@ def execute_move(actor_id: int, target: tuple[int, int] | None, world: World) ->
 
     new_x, new_y = target
     target_cell = world.get_cell(new_x, new_y)
-    if target_cell.structure == "wall":
+    if target_cell.structure_kind == "wall":
         return {"success": False, "reason": "blocked_by_wall"}
 
     old_x, old_y = agent.x, agent.y

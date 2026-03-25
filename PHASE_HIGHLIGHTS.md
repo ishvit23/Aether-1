@@ -85,3 +85,20 @@ uv run uvicorn aether.api.server:app --port 8000
 # 2. Start the React/Vite Dashboard (Terminal 2)
 cd web && npm run dev
 ```
+
+## Phase 4: Learning Agents & Ecosystem Evolution
+**Theme**: Intelligent RL decision systems and complex predator-prey dynamics.
+- **Epsilon-Greedy Q-Learning**: Upgraded rigid heuristic Action logic to dynamic Reinforcement Learning. Agents learn optimal survival strategies via Bellman updates (Exploration vs Exploitation).
+- **Lamarckian Brain Inheritance**: Offspring strictly `deepcopy` their parent's Q-Tables, representing evolutionary knowledge retention that enables complex, learned behaviors (like hunting) across generations.
+- **Multi-Tier Ecology**: Balanced map saturation by spawning destructible organic entities. Agents hunt `Rabbit` prey for high food yields and dynamically defend against `Wolf` predators.
+- **Destructible Architecture**: Structures natively transition into dynamic entities (`StructureData`) utilizing opacities that visually decay during Winter seasons on the live dashboard.
+- **Headless Pre-Trainer**: Established an automated continuous-integration wrapper (`train_policy.py`) to pre-train, harvest, and serialize millions of ticks of RL brains into master JSON distributions.
+
+### Relevant Commands (Phase 4)
+```bash
+# 1. Start the Headless Machine Learning Policy Trainer
+uv run python -m tools.train_policy --config config/colony_v4.json --episodes 50 --ticks 1000
+
+# 2. Run the Engine with dynamically loaded Brain Policies
+uv run python main.py run --config config/colony_v4.json --policy models/policy_v4.json --ticks 500
+```

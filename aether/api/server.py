@@ -67,6 +67,16 @@ async def websocket_simulate(websocket: WebSocket, config: str = "world_v1.json"
         register_all_rules()
         cfg_data = WorldLoader.load(str(config_path))
         world = WorldLoader.build_world(cfg_data)
+        
+        # Inject generated RL Policy
+        policy = None
+        policy_path = Path(__file__).parent.parent.parent / "models" / "policy_v4.json"
+        if policy_path.exists():
+            with open(policy_path, "r") as f:
+                policy = json.load(f)
+            import copy
+            for agent in world.agents.values():
+                agent.q_table = copy.deepcopy(policy)
         rule_engine = RuleEngine()
         rule_params = WorldLoader.get_rule_params(cfg_data)
         rule_engine.load_rules(cfg_data["rules_order"], rule_params)
@@ -132,8 +142,13 @@ async def websocket_simulate(websocket: WebSocket, config: str = "world_v1.json"
 
             try:
                 await websocket.send_json(payload)
-            except Exception:
-                break  # Client disconnected
+            except RuntimeError:
+                break  # Client disconnected (RuntimeError ASGI message)
+            except WebSocketDisconnect:
+                break
+            except Exception as e:
+                logger.error(f"Failed to send websocket payload: {e}")
+                break
 
             await asyncio.sleep(state["delay"])
 

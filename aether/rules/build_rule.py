@@ -21,14 +21,14 @@ class BuildRule(Rule):
             world: The simulation world.
             tick: Current tick number.
         """
-        heal_amount = self.params.get("nest_heal", 2.0)
+        heal_amount: float = float(self.params.get("nest_heal", 2.0))
 
         for agent in world.living_agents():
             current_cell = world.get_cell(agent.x, agent.y)
             healed = False
 
             # Check cell directly
-            if current_cell.structure == "nest":
+            if current_cell.structure is not None and current_cell.structure.kind == "nest":
                 agent.energy = min(100.0, agent.energy + heal_amount)
                 healed = True
 
@@ -36,6 +36,6 @@ class BuildRule(Rule):
             if not healed:
                 neighbors = world.get_neighbors(agent.x, agent.y, radius=1)
                 for n in neighbors:
-                    if n.structure == "nest":
+                    if n.structure is not None and n.structure.kind == "nest":
                         agent.energy = min(100.0, agent.energy + heal_amount)
                         break
