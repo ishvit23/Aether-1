@@ -1,6 +1,8 @@
 import asyncio
-import websockets
 import json
+
+import websockets
+
 
 async def test_ws():
     uri = "ws://localhost:8001/api/simulate?config=colony_v4.json"

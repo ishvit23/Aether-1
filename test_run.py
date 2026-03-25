@@ -1,9 +1,10 @@
 import json
-from aether.world.world_loader import WorldLoader
-from aether.engine.rule_engine import register_all_rules, RuleEngine
-from aether.engine.tick_engine import TickEngine
-from aether.api.ws_viz import WSRenderer
 import traceback
+
+from aether.api.ws_viz import WSRenderer
+from aether.engine.rule_engine import RuleEngine, register_all_rules
+from aether.engine.tick_engine import TickEngine
+from aether.world.world_loader import WorldLoader
 
 register_all_rules()
 config_path = "config/colony_v4.json"
@@ -16,10 +17,10 @@ tick_engine = TickEngine(world, rule_engine, max_ticks=cfg_data.get("ticks", 100
 renderer = WSRenderer(world)
 
 try:
-    for i in range(100):
+    for _i in range(100):
         tick_engine.run_tick(world.tick)
         world.tick += 1
-        
+
         payload = renderer.render_diff_state()
         try:
             s = json.dumps(payload)
@@ -27,7 +28,7 @@ try:
             print(f"CRASH AT TICK {world.tick}:", e)
             traceback.print_exc()
             break
-            
+
     print("Test finished natively.")
 except Exception as e:
     print("FATAL:", e)

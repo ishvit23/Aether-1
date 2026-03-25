@@ -168,11 +168,19 @@ class TickEngine:
 
         # Q-Learning Feedback Loop
         agent = self.world.agents.get(actor_id)
-        if agent is not None and agent.q_table is not None and agent.state_representation is not None and agent.last_action is not None:
+        if agent is not None \
+           and getattr(agent, "q_table", None) is not None \
+           and agent.state_representation is not None \
+           and agent.last_action is not None:
             reward = self._calculate_reward(action_type, result, agent)
             self._update_q_table(agent, reward)
 
-    def _calculate_reward(self, action_type: ActionType, result: dict[str, Any], agent: Agent) -> float:
+    def _calculate_reward(
+        self,
+        action_type: ActionType,
+        result: dict[str, Any],
+        agent: Agent,
+    ) -> float:
         """Calculate intrinsic reward for the action taken."""
         reward = -0.1  # small time penalty for existence
         if action_type == ActionType.EAT:
@@ -189,34 +197,34 @@ class TickEngine:
             reward = 1.0
         elif not result.get("success", True):
             reward = -1.0 # penalty for blocked / failed abstract action
-            
+
         # Give big penalty if agent is starving/dying
         if agent.hunger > 80.0:
             reward -= 2.0
         if agent.energy < 20.0:
             reward -= 2.0
-            
+
         return reward
 
     def _update_q_table(self, agent: Agent, reward: float) -> None:
         """Perform Bellman update on the Agent's Q-Table."""
-        from aether.agents.decision import observe, _get_discrete_state, RL_ACTIONS
-        
+        from aether.agents.decision import RL_ACTIONS, _get_discrete_state, observe
+
         s = agent.state_representation
         a = agent.last_action
-        
+
         if s is None or a is None or agent.q_table is None:
             return
-            
+
         obs = observe(agent, self.world)
         next_s = _get_discrete_state(agent, obs)
-        
+
         if next_s not in agent.q_table:
             agent.q_table[next_s] = {act: 0.0 for act in RL_ACTIONS}
-            
+
         max_q_next = max(agent.q_table[next_s].values())
         current_q = agent.q_table[s][a]
-        
+
         new_q = current_q + agent.alpha * (reward + agent.gamma * max_q_next - current_q)
         agent.q_table[s][a] = new_q
 

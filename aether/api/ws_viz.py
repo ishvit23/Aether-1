@@ -24,7 +24,10 @@ class WSRenderer:
                     struct_val = None
                     if cell.structure:
                         if hasattr(cell.structure, "kind"):
-                            struct_val = {"kind": cell.structure.kind, "health": cell.structure.health}
+                            struct_val = {
+                                "kind": cell.structure.kind,
+                                "health": cell.structure.health
+                            }
                         else:
                             struct_val = {"kind": str(cell.structure), "health": 100.0}
 

@@ -28,11 +28,12 @@ def cli() -> None:
 def run(config: str, seed: int | None, ticks: int | None, viz: str, policy: str | None) -> None:
     """Run a simulation with the given config."""
     import json
+
     from aether.simulation.simulation import Simulation
 
     loaded_policy = None
     if policy:
-        with open(policy, "r") as f:
+        with open(policy) as f:
             loaded_policy = json.load(f)
 
     sim = Simulation(

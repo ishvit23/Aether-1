@@ -58,7 +58,7 @@ class Simulation:
 
         # Build world
         self.world = WorldLoader.build_world(self.config)
-        
+
         # Inject policy
         if policy is not None:
             import copy
@@ -68,7 +68,7 @@ class Simulation:
         # Set up logging
         self.event_logger: EventLogger | None = None
         self.metrics_writer: MetricsWriter | None = None
-        
+
         if metrics_dir is not None:
             self.event_logger = EventLogger()
             self.metrics_writer = MetricsWriter()

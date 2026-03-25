@@ -1,8 +1,9 @@
 import json
-from aether.world.world_loader import WorldLoader
-from aether.engine.rule_engine import register_all_rules
-from aether.api.ws_viz import WSRenderer
 import traceback
+
+from aether.api.ws_viz import WSRenderer
+from aether.engine.rule_engine import register_all_rules
+from aether.world.world_loader import WorldLoader
 
 register_all_rules()
 config_path = "config/colony_v4.json"

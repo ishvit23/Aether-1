@@ -67,12 +67,12 @@ async def websocket_simulate(websocket: WebSocket, config: str = "world_v1.json"
         register_all_rules()
         cfg_data = WorldLoader.load(str(config_path))
         world = WorldLoader.build_world(cfg_data)
-        
+
         # Inject generated RL Policy
         policy = None
         policy_path = Path(__file__).parent.parent.parent / "models" / "policy_v4.json"
         if policy_path.exists():
-            with open(policy_path, "r") as f:
+            with open(policy_path) as f:
                 policy = json.load(f)
             import copy
             for agent in world.agents.values():

@@ -41,6 +41,6 @@ class DecayRule(Rule):
                     continue
                 rate = wall_decay if cell.structure.kind == "wall" else nest_decay
                 cell.structure.health -= rate
-                
+
                 if cell.structure.is_destroyed():
                     cell.structure = None
