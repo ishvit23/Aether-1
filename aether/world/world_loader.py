@@ -124,17 +124,30 @@ class WorldLoader:
                         amount = world.rng.uniform(1.0, 10.0)
                         world.get_cell(x, y).add_resource(resource_name, amount)
 
-        # Spawn initial agents
+        # Spawn initial agents and assign generated LLM Factions
         agent_count = initial.get("agents", 0)
         agents_config = config.get("agents_config", {})
-        for _ in range(agent_count):
+        factions = config.get("factions", [])
+
+        for i in range(agent_count):
             aid = world.next_agent_id()
             x = world.rng.randint(0, world.width - 1)
             y = world.rng.randint(0, world.height - 1)
-            traits = generate_traits(world.rng, agents_config)
+
+            faction_id = None
+            faction_traits = agents_config
+            if factions:
+                faction_obj = factions[i % len(factions)]
+                faction_id = faction_obj.get("id")
+                # Use custom nested traits if the LLM provided them, else default
+                if "traits" in faction_obj:
+                    faction_traits = faction_obj["traits"]
+
+            traits = generate_traits(world.rng, faction_traits)
             stats = dict(DEFAULT_STATS)
             stats["energy"] = world.rng.uniform(50.0, 100.0)
-            agent = Agent(id=aid, x=x, y=y, traits=traits, stats=stats)
+
+            agent = Agent(id=aid, x=x, y=y, traits=traits, stats=stats, faction_id=faction_id)
             world.add_agent(agent)
 
         return world
