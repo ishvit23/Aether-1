@@ -26,7 +26,7 @@ class WSRenderer:
                         if hasattr(cell.structure, "kind"):
                             struct_val = {
                                 "kind": cell.structure.kind,
-                                "health": cell.structure.health
+                                "health": cell.structure.health,
                             }
                         else:
                             struct_val = {"kind": str(cell.structure), "health": 100.0}
@@ -46,11 +46,15 @@ class WSRenderer:
 
         animals = []
         for animal in self.world.living_animals():
-            animals.append({
-                "id": animal.id, "kind": animal.kind,
-                "x": animal.x, "y": animal.y,
-                "health": animal.health
-            })
+            animals.append(
+                {
+                    "id": animal.id,
+                    "kind": animal.kind,
+                    "x": animal.x,
+                    "y": animal.y,
+                    "health": animal.health,
+                }
+            )
 
         # Basic distribution for pie charts
         factions: dict[str, int] = {}

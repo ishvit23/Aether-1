@@ -70,6 +70,7 @@ def execute_reproduce(
     # Keep "critical" instincts (Q >= 5.0 or Q <= -5.0) exactly to survive predators.
     # Add random Gaussian noise to mundane behaviors to simulate offspring neuroplasticity.
     import random
+
     inherited_q: dict[str, dict[str, float]] = {}
     parent_q = getattr(parent, "q_table", {})
     if parent_q:

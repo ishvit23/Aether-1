@@ -42,7 +42,9 @@ def main() -> None:
     parser.add_argument("--config", type=str, required=True, help="Path to scenario JSON")
     parser.add_argument("--episodes", type=int, default=50, help="Number of training episodes")
     parser.add_argument("--ticks", type=int, default=1000, help="Ticks per episode")
-    parser.add_argument("--out", type=str, default="models/policy_v4.json", help="Output policy JSON")  # noqa: E501
+    parser.add_argument(
+        "--out", type=str, default="models/policy_v4.json", help="Output policy JSON"
+    )  # noqa: E501
     args = parser.parse_args()
 
     master_policy: dict[str, dict[str, float]] = {}
@@ -55,7 +57,7 @@ def main() -> None:
             config_path=args.config,
             ticks=args.ticks,
             metrics_dir=None,  # No file writing during training
-            policy=master_policy, # Inject latest policy
+            policy=master_policy,  # Inject latest policy
         )
 
         # Dynamically set epsilon to decay: starts at 0.5, ends at 0.05
@@ -82,6 +84,7 @@ def main() -> None:
         json.dump(master_policy, f, indent=2)
 
     logger.info(f"Training complete. Master policy saved to {out_path}")
+
 
 if __name__ == "__main__":
     main()

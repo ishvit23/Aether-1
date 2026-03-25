@@ -75,6 +75,7 @@ async def websocket_simulate(websocket: WebSocket, config: str = "world_v1.json"
             with open(policy_path) as f:
                 policy = json.load(f)
             import copy
+
             for agent in world.agents.values():
                 agent.q_table = copy.deepcopy(policy)
         rule_engine = RuleEngine()

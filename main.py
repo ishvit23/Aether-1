@@ -22,9 +22,7 @@ def cli() -> None:
     type=click.Choice(["none", "console", "pygame"]),
     help="Visualization mode.",
 )
-@click.option(
-    "--policy", default=None, help="Path to pre-trained JSON policy to inject."
-)
+@click.option("--policy", default=None, help="Path to pre-trained JSON policy to inject.")
 def run(config: str, seed: int | None, ticks: int | None, viz: str, policy: str | None) -> None:
     """Run a simulation with the given config."""
     import json
@@ -36,9 +34,7 @@ def run(config: str, seed: int | None, ticks: int | None, viz: str, policy: str 
         with open(policy) as f:
             loaded_policy = json.load(f)
 
-    sim = Simulation(
-        config_path=config, seed=seed, ticks=ticks, viz=viz, policy=loaded_policy
-    )
+    sim = Simulation(config_path=config, seed=seed, ticks=ticks, viz=viz, policy=loaded_policy)
     sim.run()
 
 

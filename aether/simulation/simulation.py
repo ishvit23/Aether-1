@@ -62,6 +62,7 @@ class Simulation:
         # Inject policy
         if policy is not None:
             import copy
+
             for agent in self.world.agents.values():
                 agent.q_table = copy.deepcopy(policy)
 

@@ -168,10 +168,12 @@ class TickEngine:
 
         # Q-Learning Feedback Loop
         agent = self.world.agents.get(actor_id)
-        if agent is not None \
-           and getattr(agent, "q_table", None) is not None \
-           and agent.state_representation is not None \
-           and agent.last_action is not None:
+        if (
+            agent is not None
+            and getattr(agent, "q_table", None) is not None
+            and agent.state_representation is not None
+            and agent.last_action is not None
+        ):
             reward = self._calculate_reward(action_type, result, agent)
             self._update_q_table(agent, reward)
 
@@ -196,7 +198,7 @@ class TickEngine:
         elif action_type == ActionType.TRADE and result.get("success"):
             reward = 1.0
         elif not result.get("success", True):
-            reward = -1.0 # penalty for blocked / failed abstract action
+            reward = -1.0  # penalty for blocked / failed abstract action
 
         # Give big penalty if agent is starving/dying
         if agent.hunger > 80.0:
