@@ -39,7 +39,7 @@ def execute_reproduce(
         return {"success": False, "reason": "insufficient_energy"}
 
     # Population cap (matches reproduction rule)
-    if world.population_size() >= 150:
+    if world.population_size() >= getattr(world, "max_population", 150):
         return {"success": False, "reason": "population_cap"}
 
     # Cooldown check
@@ -66,6 +66,23 @@ def execute_reproduce(
     # Inherit recent memories from parent (knowledge transfer)
     inherited_memory = list(parent.memory[:5]) if parent.memory else []
 
+    # Fuzzy Lamarckian Inheritance for Q-table
+    # Keep "critical" instincts (Q >= 5.0 or Q <= -5.0) exactly to survive predators.
+    # Add random Gaussian noise to mundane behaviors to simulate offspring neuroplasticity.
+    import random
+
+    inherited_q: dict[str, dict[str, float]] = {}
+    parent_q = getattr(parent, "q_table", {})
+    if parent_q:
+        for state, actions in parent_q.items():
+            inherited_q[state] = {}
+            for action_str, q_val in actions.items():
+                if abs(q_val) >= 5.0:
+                    inherited_q[state][action_str] = q_val
+                else:
+                    noise = random.gauss(0.0, 1.0)
+                    inherited_q[state][action_str] = q_val + noise
+
     child = Agent(
         id=child_id,
         x=parent.x,
@@ -74,6 +91,7 @@ def execute_reproduce(
         stats=child_stats,
         faction_id=parent.faction_id,
         memory=inherited_memory,
+        q_table=inherited_q,
     )
     world.add_agent(child)
 

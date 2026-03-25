@@ -9,9 +9,11 @@ from aether.actions.action import Action, ActionType
 from aether.actions.attack_action import execute_attack
 from aether.actions.build_action import execute_build
 from aether.actions.collect_action import execute_collect
+from aether.actions.hunt_action import execute_hunt
 from aether.actions.move_action import execute_move
 from aether.actions.reproduce_action import execute_reproduce
 from aether.actions.trade_action import execute_trade
+from aether.agents.agent import Agent
 from aether.agents.decision import decide, observe
 from aether.agents.inventory import remove_resource as inv_remove
 from aether.engine.rule_engine import RuleEngine
@@ -149,6 +151,10 @@ class TickEngine:
             target_tuple = target if isinstance(target, tuple) else None
             result = execute_build(actor_id, target_tuple, payload, self.world)
 
+        elif action_type == ActionType.HUNT:
+            target_animal_id = target if isinstance(target, int) else None
+            result = execute_hunt(actor_id, target_animal_id, self.world)
+
         elif action_type == ActionType.IDLE:
             result = {"agent_id": actor_id, "action": "idle"}
 
@@ -159,6 +165,70 @@ class TickEngine:
                 str(action_type),
                 result,
             )
+
+        # Q-Learning Feedback Loop
+        agent = self.world.agents.get(actor_id)
+        if (
+            agent is not None
+            and getattr(agent, "q_table", None) is not None
+            and agent.state_representation is not None
+            and agent.last_action is not None
+        ):
+            reward = self._calculate_reward(action_type, result, agent)
+            self._update_q_table(agent, reward)
+
+    def _calculate_reward(
+        self,
+        action_type: ActionType,
+        result: dict[str, Any],
+        agent: Agent,
+    ) -> float:
+        """Calculate intrinsic reward for the action taken."""
+        reward = -0.1  # small time penalty for existence
+        if action_type == ActionType.EAT:
+            reward = 1.0
+        elif action_type == ActionType.REPRODUCE and result.get("success"):
+            reward = 5.0
+        elif action_type == ActionType.COLLECT and result.get("success"):
+            reward = 0.5
+        elif action_type == ActionType.HUNT and result.get("success"):
+            reward = 3.0
+        elif action_type == ActionType.ATTACK and result.get("success"):
+            reward = 2.0
+        elif action_type == ActionType.TRADE and result.get("success"):
+            reward = 1.0
+        elif not result.get("success", True):
+            reward = -1.0  # penalty for blocked / failed abstract action
+
+        # Give big penalty if agent is starving/dying
+        if agent.hunger > 80.0:
+            reward -= 2.0
+        if agent.energy < 20.0:
+            reward -= 2.0
+
+        return reward
+
+    def _update_q_table(self, agent: Agent, reward: float) -> None:
+        """Perform Bellman update on the Agent's Q-Table."""
+        from aether.agents.decision import RL_ACTIONS, _get_discrete_state, observe
+
+        s = agent.state_representation
+        a = agent.last_action
+
+        if s is None or a is None or agent.q_table is None:
+            return
+
+        obs = observe(agent, self.world)
+        next_s = _get_discrete_state(agent, obs)
+
+        if next_s not in agent.q_table:
+            agent.q_table[next_s] = {act: 0.0 for act in RL_ACTIONS}
+
+        max_q_next = max(agent.q_table[next_s].values())
+        current_q = agent.q_table[s][a]
+
+        new_q = current_q + agent.alpha * (reward + agent.gamma * max_q_next - current_q)
+        agent.q_table[s][a] = new_q
 
     def run_tick(self, tick: int) -> None:
         """Execute a single simulation tick.

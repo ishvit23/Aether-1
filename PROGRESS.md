@@ -33,3 +33,16 @@ PR: pending
 ----
 
 Agent rule: always update this file before opening PR and ensure CI passes.
+
+----
+Date: 2026-03-24
+Version: v0.4.0
+Feature: V4 Ecosystem, Q-Learning, and Titan Scaling
+Branch: v4_changes
+Files changed:
+- aether/agents/animal.py, aether/rules/animal_rule.py, aether/actions/hunt_action.py, aether/rules/decay_rule.py, aether/agents/agent.py (q_table)
+Tests: updated
+CI: passing
+Notes: Decoupled max_population constraint, scaled to Titan 200x200 grid, implemented Fuzzy Lamarckian inheritance.
+----
+

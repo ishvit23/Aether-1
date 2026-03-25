@@ -1,0 +1,26 @@
+{
+  "world": { "width": 100, "height": 100, "wrap": true },
+  "initial": {
+    "agents": 50,
+    "resource_distribution": { "food": 0.015, "material": 0.008 }
+  },
+  "rules_order": [
+    "hunger", "weather", "movement", "resource_spawn", "animal", "collect",
+    "combat", "trade", "decay", "faction", "build", "mutation", "death"
+  ],
+  "rule_params": {
+    "hunger":       { "decay_rate": 0.8, "critical_threshold": 15.0 },
+    "movement":     { "max_steps": 1.0, "energy_cost": 0.5, "goal_bias": 0.3 },
+    "resource_spawn": { "spawn_interval": 1, "spawn_prob": 0.20, "amount": 15.0 },
+    "animal":       { "rabbit_cap": 200, "wolf_cap": 40 },
+    "collect":      { "max_per_tick": 10.0, "capacity": 50.0 },
+    "combat":       { "range": 1, "damage_multiplier": 5.0, "flee_threshold": 25.0 },
+    "trade":        { "offer_threshold": 5.0, "acceptance_prob_base": 0.5 },
+    "decay":        { "wall_decay": 2.0, "nest_decay": 1.0 },
+    "reproduction": { "energy_threshold": 60.0, "child_cost": 25.0, "min_repro_age": 20.0, "repro_cooldown": 30.0, "max_population": 500.0 },
+    "mutation":     { "rate": 0.05, "max_delta": 0.1 },
+    "death":        { "energy_floor": 0.0, "max_age": 500.0 }
+  },
+  "ticks": 1000,
+  "seed": 42
+}

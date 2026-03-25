@@ -9,6 +9,7 @@ from aether.world.cell import Cell
 
 if TYPE_CHECKING:
     from aether.agents.agent import Agent
+    from aether.agents.animal import Animal
 
 
 class World:
@@ -36,10 +37,13 @@ class World:
         self.width = width
         self.height = height
         self.wrap = wrap
+        self.max_population = 150  # Dynamic cap for massive scales
         self.tick: int = 0
         self.agents: dict[int, Agent] = {}
+        self.animals: dict[int, Animal] = {}
         self.rng: random.Random = random.Random(seed)
         self._next_agent_id: int = 0
+        self._next_animal_id: int = 0
         self.weather_state: str = "Spring"
         self.global_temperature: float = 20.0
 
@@ -96,14 +100,38 @@ class World:
         return neighbors
 
     def next_agent_id(self) -> int:
-        """Generate the next unique agent ID.
-
-        Returns:
-            An integer ID that has not been used before.
-        """
+        """Generate the next unique agent ID."""
         aid = self._next_agent_id
         self._next_agent_id += 1
         return aid
+
+    def next_animal_id(self) -> int:
+        """Generate the next unique animal ID (separate namespace from agents)."""
+        aid = self._next_animal_id
+        self._next_animal_id += 1
+        return aid
+
+    def add_animal(self, animal: Animal) -> None:
+        """Add an animal to the world registry.
+
+        Args:
+            animal: Animal instance to register.
+        """
+        self.animals[animal.id] = animal
+        if animal.id >= self._next_animal_id:
+            self._next_animal_id = animal.id + 1
+
+    def remove_animal(self, animal_id: int) -> None:
+        """Remove an animal from the world registry.
+
+        Args:
+            animal_id: ID of the animal to remove.
+        """
+        self.animals.pop(animal_id, None)
+
+    def living_animals(self) -> list[Animal]:
+        """Return all living animals sorted by ID."""
+        return sorted((a for a in self.animals.values() if a.is_alive()), key=lambda a: a.id)
 
     def add_agent(self, agent: Agent) -> None:
         """Add an agent to the world and register it in its cell.

@@ -79,7 +79,9 @@ def test_building_walls_block_move():
     world.add_agent(a)
 
     # Build wall at (6, 5)
-    world.get_cell(6, 5).structure = "wall"
+    from aether.world.cell import StructureData
+
+    world.get_cell(6, 5).structure = StructureData(kind="wall")
 
     # Attempt to move there
     result = execute_move(1, (6, 5), world)

@@ -22,6 +22,12 @@ class Agent:
         inventory: Resource name -> amount currently held.
         state: Current state string (idle, moving, eating, attacking, etc.).
         memory: List for future agent memory (empty in V1).
+        q_table: Dict defining Q-values for State -> Action -> Value.
+        epsilon: Exploration rate for epsilon-greedy selection.
+        gamma: Discount factor for future rewards.
+        alpha: Learning rate.
+        state_representation: The most recent discrete state string from observe().
+        last_action: The literal discrete action chosen in the last tick.
     """
 
     id: int
@@ -33,6 +39,14 @@ class Agent:
     state: str = "idle"
     memory: list[Any] = field(default_factory=list)
     faction_id: str | None = None
+
+    # RL Attributes
+    q_table: dict[str, dict[str, float]] | None = None
+    epsilon: float = 0.1
+    gamma: float = 0.9
+    alpha: float = 0.1
+    state_representation: str | None = None
+    last_action: str | None = None
 
     @property
     def energy(self) -> float:

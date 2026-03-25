@@ -79,11 +79,13 @@ class RuleEngine:
 
 
 def register_all_rules() -> None:
-    """Register all built-in V1 rules with the RuleEngine."""
+    """Register all built-in rules with the RuleEngine."""
+    from aether.rules.animal_rule import AnimalRule
     from aether.rules.build_rule import BuildRule
     from aether.rules.collect_rule import CollectRule
     from aether.rules.combat_rule import CombatRule
     from aether.rules.death_rule import DeathRule
+    from aether.rules.decay_rule import DecayRule
     from aether.rules.faction_rule import FactionRule
     from aether.rules.hunger_rule import HungerRule
     from aether.rules.movement_rule import MovementRule
@@ -92,6 +94,8 @@ def register_all_rules() -> None:
     from aether.rules.trade_rule import TradeRule
     from aether.rules.weather_rule import WeatherRule
 
+    RuleEngine.register("animal", AnimalRule)
+    RuleEngine.register("decay", DecayRule)
     RuleEngine.register("hunger", HungerRule)
     RuleEngine.register("movement", MovementRule)
     RuleEngine.register("resource_spawn", ResourceSpawnRule)

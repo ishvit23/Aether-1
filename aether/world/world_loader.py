@@ -109,6 +109,11 @@ class WorldLoader:
             seed=seed,
         )
 
+        # Apply custom params
+        rule_params = WorldLoader.get_rule_params(config)
+        repro_params = dict(rule_params.get("reproduction", {}))
+        world.max_population = int(repro_params.get("max_population", 150))
+
         # Spawn initial resources
         initial = config.get("initial", {})
         resource_dist: dict[str, float] = initial.get("resource_distribution", {})

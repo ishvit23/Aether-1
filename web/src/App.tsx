@@ -30,7 +30,11 @@ function App() {
     const socket = new WebSocket(`ws://localhost:8000/api/simulate?config=${selectedScenario}`);
     
     socket.onopen = () => setConnectionStatus('Connected (Live)');
-    socket.onclose = () => setConnectionStatus('Disconnected');
+    socket.onclose = () => {
+      setConnectionStatus('Disconnected');
+      setWs(null);
+      setPaused(false);
+    };
     
     socket.onmessage = (e) => {
       const data = JSON.parse(e.data);

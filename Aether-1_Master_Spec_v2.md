@@ -171,21 +171,23 @@ jobs:
 |---|---|---|---|
 | Console grid | rich | Default | Rendered every N ticks; configurable interval |
 | Pygame renderer | pygame >= 2.5 | `--viz pygame` | Color-coded cells; agent dots; resource heat map |
-| Web UI | Future (V2+) | `--viz web` | Canvas + chart + replay timeline; TBD stack |
+| Web UI (V3.5) | FastAPI + React/Vite | `uvicorn` + `npm run dev` | Live WebSocket streaming to HTML5 Canvas |
+| 2D Pixel Art (V4) | React `Renderer.tsx` | UI toggle | 16×16 tile sprites; faction-colored agents; seasonal overlays |
 
----
+> **Design rationale for 2D Pixel Art**: The pixel art renderer targets the existing React/Vite web client introduced in V3.5 — no Python changes required. The FastAPI WebSocket already streams full world-state JSON every tick; `Renderer.tsx` simply switches from solid-color rectangles to composited sprite tiles. This preserves decoupling between the Python engine and the frontend visualization layer.
 
 ## 4. Version Roadmap
 
-| Version | Name | Key Deliverables |
-|---|---|---|
-| V1 | Core Engine | Grid world, rule engine, generic agents, base rules, config system, logging, console viz |
-| V2 | Configurable Worlds & Tooling | Multiple world configs, replay engine, improved viz, CLI experiment tools |
-| V3 | Civilization & Economy | Roles, teams, territories, market mechanics, resource specialization |
-| V4 | Learning Agents | Agent memory, basic RL/heuristics, policy training harness |
-| V5 | LLM World Generation | Optional LLM rule to generate configs from text prompts; scenario templates |
-| V6 | LLM Agents & Narrative | Leader agents with LLM planning; narrative/description layer from event logs |
-| V7 | Universe Engine | Plugin rule packs, multi-world orchestration, scalable experiments, research analytics |
+| Version | Name | Key Deliverables | Status |
+|---|---|---|---|
+| V1 | Core Engine | Grid world, rule engine, agents, base rules, logging, console viz | ✅ Complete |
+| V2 | Configurable Worlds & Tooling | Scenario library, parameter sweeps, experiment CLI tools, replay | ✅ Complete |
+| V3 | Civilization & Economy | Factions, weather/seasons, memory inheritance, base building, pop cap 150 | ✅ Complete |
+| V3.5 | Web Dashboard | FastAPI WebSocket backend, React/Vite frontend, HTML5 Canvas 60 FPS renderer, live charts | ✅ Complete |
+| V4 | Learning Agents & Ecosystem | Animals (prey/predators), structure durability/siege, Q-Learning agents, policy training harness | 🔄 In Progress |
+| V5 | Frontend Polish & LLM World Gen | 2D pixel art sprites, seasonal overlays, faction colors; LLM config generation from text prompts | 📋 Planned |
+| V6 | LLM Agents & Narrative | Leader agents with LLM planning; narrative/description layer from event logs | 📋 Planned |
+| V7 | Universe Engine | Plugin rule packs, multi-world orchestration, scalable experiments, research analytics | 📋 Planned |
 
 ---
 
@@ -532,10 +534,29 @@ File: `logs/run_<timestamp>_meta.json` — written at start of each run.
 - Color-coded cells for resource presence; agent dots sized by strength.
 - Resource heat map overlay; optional agent trail rendering.
 
+### Web Dashboard (V3.5+)
+
+- **Backend:** FastAPI server (`aether/api/server.py`) with a `/api/simulate` WebSocket endpoint.
+- **Frontend:** React + Vite SPA in `web/`, connects to the WebSocket and renders world state.
+- **Canvas Engine:** `web/src/components/Renderer.tsx` — custom HTML5 Canvas loop at 60 FPS.
+- **Charts:** `web/src/components/Charts.tsx` — Chart.js sparklines for population and faction pie charts.
+- **Run:** `uvicorn aether.api.server:app --port 8000` (backend) + `cd web && npm run dev` (frontend).
+
+### 2D Pixel Art Renderer (V5, frontend only)
+
+> **Deferred from V4.** Will be implemented in V5 alongside LLM World Generation. The backend engine does not need to change — this is a pure `Renderer.tsx` upgrade once enough engine features (Animals, Q-Learning) exist to make the visualization meaningful.
+
+- **Tileset:** 16×16 PNG sprite sheet (`web/public/tiles.png`) with tiles for `grass`, `dirt`, `wall`, `nest`, `berry_bush`, `rock`.
+- **Agents:** 4-directional character sprites (`agent_N/S/E/W`), hue-shifted by faction ID using `OffscreenCanvas` for distinct clan colors.
+- **Animals:** Separate `rabbit` and `wolf` sprite variants.
+- **State Emotes:** Small icon bubble rendered above agents: `⚔️` (combat), `💰` (trade), `🏗️` (building), `🐺` (being chased).
+- **Season Overlay:** Full-canvas composited tint layer — white snow in Winter, warm orange in Autumn, bright green in Spring.
+- **Camera:** Optional pan-and-zoom (mouse wheel), centering on the highest-density faction cluster.
+
 ### Replay
 
 - Replay engine reads JSONL event log and reconstructs world state per tick.
-- CLI: `python main.py replay --log logs/run_<timestamp>.jsonl`
+- CLI: `python main.py replay --log logs/latest_run.jsonl`
 - Must be bit-for-bit identical to original run given the same seed.
 
 ---
