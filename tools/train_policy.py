@@ -5,12 +5,11 @@ import json
 import logging
 from collections import defaultdict
 from pathlib import Path
+from typing import Any
 
 from aether.simulation.simulation import Simulation
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-from typing import Any
-
 logger = logging.getLogger(__name__)
 
 
