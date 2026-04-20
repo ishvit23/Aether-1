@@ -128,6 +128,7 @@ class WorldLoader:
         agent_count = initial.get("agents", 0)
         agents_config = config.get("agents_config", {})
         factions = config.get("factions", [])
+        world.factions_config = factions
 
         for i in range(agent_count):
             aid = world.next_agent_id()

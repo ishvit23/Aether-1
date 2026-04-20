@@ -11,7 +11,7 @@ class LLMClient:
     """Wrapper for executing local LLM prompts synchronously via HTTP."""
 
     def __init__(
-        self, endpoint: str = "http://localhost:11434/api/generate", model: str = "llama3"
+        self, endpoint: str = "http://localhost:11434/api/generate", model: str = "llama3.2:3b"
     ):
         self.endpoint = endpoint
         self.model = model
@@ -22,7 +22,7 @@ class LLMClient:
             "model": self.model,
             "prompt": prompt,
             "system": system,
-            "stream": False,
+            "stream": True,
             "format": "json",
         }
         data = json.dumps(payload).encode("utf-8")
@@ -31,9 +31,21 @@ class LLMClient:
         )
 
         try:
-            with urllib.request.urlopen(req, timeout=120) as response:
-                result = json.loads(response.read().decode("utf-8"))
-                return str(result.get("response", "{}"))
+            import sys
+
+            full_response = ""
+            print(f"\n[STREAM] Awaiting link to '{self.model}'...\n")
+            with urllib.request.urlopen(req, timeout=600) as response:
+                for line in response:
+                    if not line:
+                        continue
+                    chunk = json.loads(line.decode("utf-8"))
+                    text = chunk.get("response", "")
+                    sys.stdout.write(text)
+                    sys.stdout.flush()
+                    full_response += text
+            print("\n")
+            return full_response
         except Exception as e:
             logger.error(f"LLM API Request failed: {e}")
             return "{}"

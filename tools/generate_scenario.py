@@ -26,6 +26,7 @@ Example target schema:
     {
       "id": "Frost-Walkers",
       "color": "#00FFFF",
+      "description": "Vicious nomadic warriors molded by extreme winter cold.",
       "traits": { "aggression": [0.8, 1.0], "speed": [1.0, 1.5] }
     },
     { "id": "Snow-Hunters", "color": "#FFFFFF", "traits": { "strength": [10.0, 15.0] } }
@@ -57,6 +58,7 @@ Example target schema:
 Analyze the user's prompt. Tune the specific parameters, capacities, rates, and
 resource distributions to perfectly model the ecosystem they requested as mathematical data.
 ALWAYS output valid unescaped JSON. DO NOT include markdown backticks.
+CRITICAL: The world.wrap parameter MUST ALWAYS be true to prevent agents from walking out of bounds.
 """
 
 
@@ -67,6 +69,11 @@ def generate_scenario(prompt: str, out_path: str, model: str) -> None:
 
     try:
         data = json.loads(response)
+        if not data:
+            raise ValueError(
+                f"Target LLM '{model}' returned an empty payload. Is the server offline?"
+            )
+
         out_file = Path(out_path)
         out_file.parent.mkdir(parents=True, exist_ok=True)
         with out_file.open("w") as f:
@@ -87,7 +94,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--out", type=str, default="config/generated_scenario.json", help="Saved path."
     )
-    parser.add_argument("--model", type=str, default="llama3", help="Ollama target model name.")
+    parser.add_argument(
+        "--model", type=str, default="llama3.2:3b", help="Ollama target model name."
+    )
 
     args = parser.parse_args()
     generate_scenario(args.prompt, args.out, args.model)

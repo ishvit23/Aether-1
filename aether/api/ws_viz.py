@@ -71,6 +71,7 @@ class WSRenderer:
             "agents": agents,
             "animals": animals,
             "factions": factions,
+            "faction_metadata": getattr(self.world, "factions_config", []),
         }
 
     def render_diff_state(self) -> dict[str, Any]:

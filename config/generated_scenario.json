@@ -1,0 +1,43 @@
+{
+  "world": { "width": 50, "height": 50, "wrap": true },
+  "initial": {
+    "agents": 60,
+    "resource_distribution": { "food": 0.05, "material": 0.05 }
+  },
+  "factions": [
+    {
+      "id": "Vikings",
+      "color": "#ff3333",
+      "description": "A highly aggressive and violent raiding tribe that thrives on combat and strength.",
+      "traits": { "aggression": [0.8, 1.0], "strength": [8.0, 15.0], "speed": [0.8, 1.2] }
+    },
+    {
+      "id": "Druids",
+      "color": "#33ff33",
+      "description": "Peaceful forest monks who lack martial prowess but can sprint away from danger incredibly fast.",
+      "traits": { "aggression": [0.0, 0.2], "strength": [1.0, 3.0], "speed": [1.8, 2.5], "reproduction_urge": [0.6, 1.0] }
+    }
+  ],
+  "rules_order": [
+    "hunger", "weather", "movement", "resource_spawn", "animal", "collect",
+    "combat", "trade", "decay", "faction", "build", "mutation", "death"
+  ],
+  "rule_params": {
+    "hunger":       { "decay_rate": 0.8, "critical_threshold": 15.0 },
+    "movement":     { "max_steps": 1.0, "energy_cost": 0.5, "goal_bias": 0.3 },
+    "resource_spawn": { "spawn_interval": 1, "spawn_prob": 0.30, "amount": 25.0 },
+    "animal":       { "rabbit_cap": 80, "wolf_cap": 15 },
+    "decay":        { "wall_decay": 2.0, "nest_decay": 1.0 },
+    "reproduction": {
+      "energy_threshold": 65.0,
+      "child_cost": 20.0,
+      "min_repro_age": 15.0,
+      "repro_cooldown": 25.0,
+      "max_population": 300.0
+    },
+    "mutation":     { "rate": 0.05, "max_delta": 0.1 },
+    "death":        { "energy_floor": 0.0, "max_age": 500.0 }
+  },
+  "ticks": 2000,
+  "seed": 101010
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Pause, FastForward, SkipForward, Server } from 'lucide-react';
 import Renderer from './components/Renderer';
 import Charts from './components/Charts';
@@ -10,6 +10,7 @@ function App() {
   
   const [state, setState] = useState<any>(null);
   const [history, setHistory] = useState<any[]>([]);
+  const [fullStats, setFullStats] = useState<any[]>([]);
   const [paused, setPaused] = useState(false);
   const [speed, setSpeed] = useState(0.05);
   const [connectionStatus, setConnectionStatus] = useState('Disconnected');
@@ -24,6 +25,7 @@ function App() {
   const connect = () => {
     if (ws) ws.close();
     setHistory([]);
+    setFullStats([]);
     setState(null);
     setConnectionStatus('Connecting...');
     
@@ -39,8 +41,18 @@ function App() {
     socket.onmessage = (e) => {
       const data = JSON.parse(e.data);
       if (data.type === 'init' || data.type === 'tick') {
+        const globalEnergy = Math.round(data.agents.reduce((a: number, b: any) => a + b.energy, 0));
         setState(data);
-        setHistory(prev => [...prev.slice(-200), data]); // keep last 200 ticks
+        setHistory(prev => [...prev.slice(-200), data]); // keep last 200 ticks for charts
+
+        setFullStats(prev => [...prev, {
+          tick: data.tick,
+          weather: data.weather,
+          population: data.population,
+          animalPopulation: data.animals?.length || 0,
+          globalEnergy: globalEnergy,
+          factions: JSON.stringify(data.factions || {})
+        }]);
       }
     };
     
@@ -74,6 +86,33 @@ function App() {
     const val = parseFloat(e.target.value);
     setSpeed(val);
     sendCommand('speed', { delay: val });
+  };
+
+  const exportReport = () => {
+    if (fullStats.length === 0) return;
+    
+    // Dynamically identify all unique factions spawned over the entire simulation
+    const factionSet = new Set<string>();
+    fullStats.forEach(stat => {
+      const fObj = JSON.parse(stat.factions);
+      Object.keys(fObj).forEach(k => factionSet.add(k));
+    });
+    const factionNames = Array.from(factionSet);
+    
+    let csv = `Tick,Season,Population,Animal_Population,Global_Energy,${factionNames.map(f => `${f}_Pop`).join(',')}\n`;
+    fullStats.forEach(stat => {
+      const fObj = JSON.parse(stat.factions);
+      const factionCols = factionNames.map(name => fObj[name] || 0).join(',');
+      csv += `${stat.tick},${stat.weather},${stat.population},${stat.animalPopulation},${stat.globalEnergy},${factionCols}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Aether-1-Report-${selectedScenario}-${new Date().getTime()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -116,6 +155,10 @@ function App() {
             </button>
           </div>
 
+          <button className="btn" onClick={exportReport} disabled={fullStats.length === 0} style={{ width: '100%', marginTop: '10px', background: '#238636', color: '#ffffff' }}>
+            Export Metrics CSV
+          </button>
+
           <div style={{ marginTop: '16px' }}>
             <label style={{ fontSize: '12px', color: '#8b949e', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <FastForward size={14} /> Engine Speed
@@ -128,6 +171,23 @@ function App() {
             </select>
           </div>
         </div>
+
+        {state && state.faction_metadata && state.faction_metadata.length > 0 && (
+          <div className="panel" style={{ marginTop: '16px' }}>
+            <h2>Ecosystem Factions (LLM)</h2>
+            {state.faction_metadata.map((f: any) => (
+              <div key={f.id} style={{ marginBottom: '8px', padding: '8px', background: '#1e242b', borderRadius: '4px', borderLeft: `4px solid ${f.color || '#cccccc'}` }}>
+                <h3 style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#c9d1d9' }}>{f.id}</h3>
+                {f.description && <p style={{ fontSize: '11px', color: '#8b949e', margin: 0, lineHeight: 1.4 }}>{f.description}</p>}
+                {state.factions && state.factions[f.id] !== undefined && (
+                  <div style={{ fontSize: '10px', color: '#58a6ff', marginTop: '4px', textAlign: 'right' }}>
+                    Population: {state.factions[f.id]}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         {state && (
           <div className="stat-grid">

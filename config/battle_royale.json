@@ -1,0 +1,123 @@
+{
+  "world": {
+    "width": 100,
+    "height": 100,
+    "wrap": true
+  },
+  "initial": {
+    "agents": 100,
+    "resource_distribution": {
+      "food": 0.0001,
+      "material": 0.005,
+      "water": 0.01
+    }
+  },
+  "factions": [
+    {
+      "id": "Aquatic Merchants",
+      "color": "#00FF00",
+      "description": "Skilled aquatic traders navigating the vast ocean.",
+      "traits": {
+        "aggression": [
+          0.2,
+          1.0
+        ],
+        "speed": [
+          1.0,
+          3.0
+        ]
+      }
+    },
+    {
+      "id": "Slow Cave-Trolls",
+      "color": "#808080",
+      "description": "Massive cave-dwelling creatures that slowly roam the dark tunnels.",
+      "traits": {
+        "aggression": [
+          0.1,
+          1.0
+        ],
+        "speed": [
+          0.5,
+          2.0
+        ]
+      }
+    },
+    {
+      "id": "Bird-People",
+      "color": "#0000FF",
+      "description": "Highly intelligent avian beings mastering the art of flight and trade.",
+      "traits": {
+        "aggression": [
+          0.8,
+          1.2
+        ],
+        "speed": [
+          3.0,
+          6.0
+        ]
+      }
+    }
+  ],
+  "rules_order": [
+    "hunger",
+    "weather",
+    "movement",
+    "resource_spawn",
+    "combat",
+    "trade",
+    "decay",
+    "faction",
+    "build",
+    "mutation",
+    "death"
+  ],
+  "rule_params": {
+    "hunger": {
+      "decay_rate": 0.9,
+      "critical_threshold": 20.0
+    },
+    "movement": {
+      "max_steps": 5.0,
+      "energy_cost": 0.1,
+      "goal_bias": 0.2
+    },
+    "resource_spawn": {
+      "spawn_interval": 10,
+      "spawn_prob": 0.01,
+      "amount": 2.0
+    },
+    "combat": {
+      "attack_multiplier": 5.0,
+      "defend_multiplier": 3.0,
+      "min_attack_value": 50.0,
+      "max_defense_value": 100.0
+    },
+    "trade": {
+      "trade_rate": 0.1,
+      "trade_cost": 10.0
+    },
+    "decay": {
+      "wall_decay": 3.0,
+      "nest_decay": 2.0
+    },
+    "faction": {
+      "repro_cooldown": 60.0,
+      "max_population": 200.0
+    },
+    "build": {
+      "min_resources": 100.0,
+      "max_build_time": 300.0
+    },
+    "mutation": {
+      "rate": 0.1,
+      "max_delta": 2.0
+    },
+    "death": {
+      "energy_floor": 5.0,
+      "max_age": 500.0
+    }
+  },
+  "ticks": 1000,
+  "seed": 42
+}

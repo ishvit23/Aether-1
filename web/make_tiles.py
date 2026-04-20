@@ -1,5 +1,7 @@
 import os
+
 from PIL import Image, ImageDraw
+
 
 def main():
     os.makedirs("public", exist_ok=True)
@@ -20,12 +22,12 @@ def main():
     d.line([26, 4, 26, 10], fill="#333333", width=1)
 
     # Tile 2: Nest (x: 32 to 47)
-    d.rectangle([32, 0, 47, 15], fill="#2d4c1e") # grass bg
-    d.ellipse([34, 4, 45, 12], fill="#5c4033", outline="#3b2b20") # nest
-    d.ellipse([37, 6, 42, 10], fill="#3b2b20") # inner hole
+    d.rectangle([32, 0, 47, 15], fill="#2d4c1e")  # grass bg
+    d.ellipse([34, 4, 45, 12], fill="#5c4033", outline="#3b2b20")  # nest
+    d.ellipse([37, 6, 42, 10], fill="#3b2b20")  # inner hole
 
     # Tile 3: Humanoid Base Sprite (x: 48 to 63)
-    d.rectangle([48, 0, 63, 15], fill=(0,0,0,0)) # clear bg
+    d.rectangle([48, 0, 63, 15], fill=(0, 0, 0, 0))  # clear bg
     # Head
     d.rectangle([53, 2, 58, 6], fill="#FFFFFF", outline="#000000")
     # Body
@@ -36,6 +38,7 @@ def main():
 
     img.save("public/tiles.png")
     print("Generated public/tiles.png successfully.")
+
 
 if __name__ == "__main__":
     main()

@@ -68,7 +68,12 @@ const Charts: React.FC<ChartsProps> = ({ history, currentState }) => {
     const factions = currentState.factions;
     const labels = Object.keys(factions);
     const data = Object.values(factions);
-    const bgColors = labels.map(l => FACTION_COLORS[l] || "#aaaaaa");
+    const bgColors = labels.map(l => {
+      // Prioritize dynamically generated LLM matrix hex colors instead of legacy fallbacks
+      const meta = (currentState.faction_metadata || []).find((m: any) => m.id === l);
+      if (meta && meta.color) return meta.color;
+      return FACTION_COLORS[l] || "#aaaaaa";
+    });
 
     return {
       labels,

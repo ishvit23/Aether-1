@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from aether.world.cell import Cell
 
@@ -41,6 +41,7 @@ class World:
         self.tick: int = 0
         self.agents: dict[int, Agent] = {}
         self.animals: dict[int, Animal] = {}
+        self.factions_config: list[dict[str, Any]] = []
         self.rng: random.Random = random.Random(seed)
         self._next_agent_id: int = 0
         self._next_animal_id: int = 0

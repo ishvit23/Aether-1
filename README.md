@@ -16,28 +16,29 @@
 
 ## 📖 Overview
 
-**Aether-1** is a deterministic, modular grid-based simulation engine built in Python. Designed for research, AI experimentation, and complex system modeling, it allows thousands of unique agents to interact, trade, fight, reproduce, and mutate over customizable torus-wrapped topologies. 
+**Aether-1** is a deterministic, modular grid-based simulation engine built in Python, paired with a modern React+Vite web dashboard for real-time visualization. Designed for research, AI experimentation, and complex system modeling, it allows thousands of unique agents to interact, trade, fight, reproduce, and mutate over customizable torus-wrapped topologies. 
 
-Powered by priority-based decision logic and an entirely decoupled rule engine, Aether-1 lets you define the physics and societal rules of the world exclusively through unified configuration structures.
+Powered by priority-based decision logic and an entirely decoupled rule engine, Aether-1 lets you define the physics and societal rules of the world exclusively through unified configuration structures—now enhanced with Natural Language LLM generation!
 
 ---
 
 ## ✨ Key Features
 
 *   **🧬 High-Fidelity Agent Models:** Agents possess nuanced statistics and fully mutable genetic traits. 
-*   **🧠 Tabular Q-Learning (Epsilon-Greedy):** Intelligent agents natively map states logic arrays across dynamic lifetimes, retaining generational success via *Fuzzy Lamarckian Inheritance*.
-*   **🌍 Deterministic Torus World:** The grid strictly adheres to seeded pseudorandom number generation to ensure 100% determinism across 40,000 tile geographies (Titan Scale).
-*   **🐺 Multi-Tier Artificial Ecology:** The maps populate natively with unscripted Prey (Rabbits) and Predators (Wolves) supporting complex hunting dependencies and seasonal shelter siege loops.
-*   **⚙️ Uncoupled Rule Engine:** The game loop is completely data-driven. Rules like `hunger`, `combat`, `trade`, and `mutation` are decoupled classes injected into the simulation sequentially. 
-*   **🏎️ Production Ready Codebase:** Heavily sanitized using modern tooling: `uv` package management, `ruff` auto-linting, `mypy --strict` typings, and sprawling `pytest` suites.
+*   **🧠 RL & Tabular Q-Learning:** Intelligent agents natively map states using dynamic lifetimes, retaining generational success via *Fuzzy Lamarckian Inheritance*.
+*   **🌍 Deterministic Torus World:** The grid strictly adheres to seeded pseudorandom number generation to ensure 100% determinism.
+*   **🐺 Multi-Tier Artificial Ecology:** The maps populate natively with unscripted Prey (Rabbits) and Predators (Wolves) supporting complex hunting dependencies and seasonal shelter loops.
+*   **⚙️ Uncoupled Rule Engine:** The game loop is data-driven. Rules like `hunger`, `combat`, `trade`, and `mutation` are decoupled classes.
+*   **🗣️ LLM World Generation:** Generate fully compliant, mathematically-balanced ecosystem JSON configs directly from natural language prompts.
+*   **🎨 Web Dashboard Visualization:** Explore your simulations in real-time or via replay with a sleek React + TypeScript HTML5 dashboard.
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Installation
+### 1. Backend Engine (Python / uv)
 
-Aether-1 uses the blazingly fast [uv](https://github.com/astral-sh/uv) package manager. 
+Aether-1 uses the blazingly fast [uv](https://github.com/astral-sh/uv) package manager for the simulation core.
 
 ```bash
 # Clone the repository
@@ -48,78 +49,109 @@ cd Aether-1
 uv sync
 ```
 
-### 2. Run the Simulation
-
-You can execute a full 500-tick simulation with a lively terminal dashboard using the built-in run command:
-
+**Run a Simulation:**
 ```bash
 uv run python main.py run --config config/world_v1.json --ticks 500 --viz console
 ```
 
-### 3. Validate Configurations
-
-Verify your custom rule injections and population arrays before launching heavy simulations:
+**Validate Configurations:**
+Verify your custom rule injections before launching heavy simulations:
 ```bash
 uv run python main.py validate-config --config config/world_v1.json
 ```
 
-### 4. Step-by-Step Replay
-Reconstruct and analyze past simulation events from a JSONL log file:
+**Step-by-Step Replay:**
+Reconstruct past simulation events from a JSONL log file:
 ```bash
-uv run python main.py replay --log logs/run_YYYYMMDD_HHMMSS.jsonl
+uv run python main.py replay --log logs/latest_run.jsonl
 ```
 
-### 5. Run Experiments
-Execute batch simulations across multiple seeds for statistical analysis:
+### 2. Frontend Web Dashboard (React / Vite)
+
+The `web/` directory contains a modern 2D rendering dashboard.
+
 ```bash
-uv run python experiments/run_experiment.py --seeds 5 --ticks 200
+cd web
+npm install
+
+# Start the Vite development server for live previews
+npm run dev
+
+# Build for production
+npm run build
+
+# Run linting
+npm run lint
 ```
 
-### 6. Containerized Runs (Docker)
-Build and run the simulation in a completely isolated environment:
+### 3. AI & Advanced Tools (`tools/`)
+
+We provide several standalone utility scripts for advanced orchestration:
+
+**LLM Scenario Generator:**
+Generate JSON configs dynamically using local or remote LLMs (requires a configured LLM client).
 ```bash
-docker build -t aether-1 .
-docker run aether-1 run --ticks 100
+uv run python -m tools.generate_scenario --prompt "A harsh winter landscape with heavily mutated wolves" --out config/generated_scenario.json --model llama3
+```
+
+**Q-Learning Policy Pre-Trainer:**
+Train and average master RL policies across multi-episode headless runs to build smarter baseline agents.
+```bash
+uv run python -m tools.train_policy --config config/world_v1.json --episodes 50 --ticks 1000 --out models/policy_v4.json
+```
+
+**Simulation Analytics:**
+Parse output metrics to quickly inspect run totals (births, deaths, hunts).
+```bash
+uv run python analyze_v4.py
 ```
 
 ---
 
 ## 🛠️ Project Structure
 
-The engine's architecture enforces strict separation of concerns to allow easy drop-in implementations for future milestones.
+The project enforces strict separation of concerns across backend engine, web visuals, and toolkits.
 
 ```plaintext
-aether/
-├── actions/        # Executors for atomic operations (Trade, Attack, Move)
-├── agents/         # Agent dataclass, genetic traits, and inventory logic
-├── engine/         # The core TickEngine loop and sequential RuleEngine
-├── resources/      # Abstracted models mapping world tangibles
-├── rules/          # Drop-in ABC implementations for world physics/interaction
-├── simulation/     # Top-level orchestration module
-├── utils/          # Factory RNGs, constants, and logging mechanisms
-└── viz/            # Console grid rendering and Pygame dashboard scaffolding
-config/             # Extensible JSON/YAML files determining world states
-tests/              # Robust 60+ assertion test suite matching strict metrics
+Aether-1/
+├── aether/         # Core Simulation Backend
+│   ├── actions/    # Executors for atomic operations (Trade, Attack, Move)
+│   ├── agents/     # Agent dataclass, genetic traits, and inventory logic
+│   ├── engine/     # The core TickEngine loop and sequential RuleEngine
+│   ├── rules/      # Drop-in implementations for world physics/interaction
+│   └── viz/        # Console and backend render scaffolding
+├── config/         # JSON/YAML files determining world states
+├── logs/           # Output metrics, run histories, and JSONL replay files
+├── tools/          # Standalone utilities
+│   ├── generate_scenario.py  # LLM natural language config generation
+│   ├── train_policy.py       # Multi-episode Q-Learning policy training
+│   └── llm_client.py         # Submodule for LLM API negotiation
+├── web/            # HTML5 Web Dashboard (React, TypeScript, Vite)
+│   ├── src/        # Frontend components, rendering logic, and state management
+│   └── package.json# NPM dependencies and scripts
+├── experiments/    # Batch runners for multi-seed statistical analysis
+├── tests/          # Robust pytest suite matching strict metrics
+└── main.py         # Primary CLI entry point for the backend engine
 ```
 
 ---
 
 ## 💻 Development & Contributing
 
-### Setup Hooks & Dependencies
+### Setup Hooks & Tests
 Ensure you have the development layer installed to run local checks.
 ```bash
 uv sync
 pre-commit install
 ```
 
-### Running the Test Suite
-Aether-1 maintains 100% passing tests for robust architectural guarantees.
+### Validating the Backend
+Aether-1 maintains robust architectural guarantees.
 ```bash
 # Execute unit and integration tests
 uv run pytest -v 
 
-# Static analysis 
+# Static analysis and linting
 uv run mypy aether/
 uv run ruff check .
 ```
@@ -137,4 +169,4 @@ uv run ruff check .
 - [x] **Milestone 7:** Advanced Logging, Diagnostic Replays & Experiments
 - [x] **Milestone 8:** Containerization (Docker) & Final Documentation
 - [x] **Milestone 9 (V4):** Learning Agents, Multi-Tier Ecology (Animals), Structure Sieging, and Titan-Scale Performance
-- [ ] **Milestone 10 (V5):** Language Model World Generation and HTML5 2D Pixel Art Overhaul
+- [x] **Milestone 10 (V5):** Language Model World Generation and HTML5 2D Pixel Art Overhaul

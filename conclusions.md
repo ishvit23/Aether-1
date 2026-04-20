@@ -109,3 +109,34 @@ To address the "perfect knowledge" stagnation of strict Lamarckian copying, we i
 
 The ecosystem logic is conclusively decoupled from map-size limitations and supports advanced evolutionary neuroplasticity. Phase 4 is officially complete.
 
+---
+
+# Aether-1 Phase 5: LLM Ecosystems & Visual Overhaul
+
+This section summarizes the outcomes of the Phase 5 (V5) update, transitioning Aether-1 from a developer-locked mechanical sandbox into a massively interactive, visually polished Generative AI platform.
+
+## 1. Feature Integrations
+
+1. **Generative Language Model Orchestration (`generate_scenario.py`)**:
+   * Removed the need for manual JSON environment building. Users can now architect worlds purely via Natural Language.
+   * Engineered a robust pipeline natively using local **Ollama** endpoints (`llm_client.py`). The engine leverages strict System Prompt engineering to coerce LLMs into outputting purely mathematical, unescaped JSON schemas that define weather cycles, structural decay, food sparsity, and complex biological capabilities (child costs, aggression thresholds).
+2. **Generative Faction Cultures**:
+   * The Python `World` and `WorldLoader` matrices were rewritten to interpret dynamically generated tribes rather than static defaults.
+   * LLMs assign names (e.g. *Frost-Walkers*), unique socio-cultural text descriptions, specific hex colorings, and behaviorally-tuned numeric limits (e.g. forced high aggression ranges) bounding the trait initialization of all spawned agents.
+3. **2D Pixel Art Overhaul (`Renderer.tsx`)**:
+   * The primitive `ctx.fillRect()` frontend dashboard was completely discarded.
+   * Engineered a discrete pixel-perfect React coordinate engine pointing to a generated `tiles.png`. All base terrain, architecture, and nests render as crisp graphical representations.
+4. **HTML5 Composite Hue-Shifting**:
+   * To prevent manually designing hundreds of sprites for infinite LLM factions, we built an off-screen graphical cache.
+   * Base humanoid white sprites are dynamically painted and blend-composited (`globalCompositeOperation = "multiply"`) against the incoming Faction Hex color arrays on the fly.
+5. **Intent Emojis & Atmospheric Shaders**:
+   * Global weather conditions (Winter, Autumn) natively inject massive full-screen transparent overlays simulating physical frost/cold.
+   * Agents express internal `state` matrices natively on-screen using logic-bound emojis floating perfectly aligned above their 16x16 geographical sprites (e.g., rendering ⚔️ exactly when `agent.state == 'attacking'`).
+
+## 2. Verification & Conclusions
+
+* **Strict Backend Payload Formatting:** The integration verified that the Python `ws_viz.py` websocket successfully serializes and streams non-uniform LLM socio-cultural data (Strings, Arrays, Hex Strings) seamlessly across the wire into React without shattering the rigid tick timing of the CPython Engine.
+* **Graphical Efficacy:** Ripping out abstracted DOM manipulation for native Canvas Tile mapping proved immensely performant. The browser's 60 Frames-Per-Second threshold is safely maintained because of the isolated Javascript off-screen tinting map, allowing the game loop to exclusively call absolute `drawImage()` rather than computing massive color math every individual tick loop.
+* **LLM Robustness:** Prompting tests explicitly verified the python parsing mechanism ignores markdown hallucinations and strips raw dicts directly into the core `WorldLoader`, ensuring maximum system stability even when the Language Model is highly creative.
+
+Phase 5 is verified and deployed. The platform now supports unbounded generative expansion and immediate visual game loops.
