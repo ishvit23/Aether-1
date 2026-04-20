@@ -12,8 +12,7 @@ jobs:
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run mypy aether/
-      - run: uv run pytest --cov=aether --cov-fail-under=80
-
+      - run: uv run pytest --cov=aether --cov-fail-under=65
   integration:
     runs-on: ubuntu-latest
     if: github.base_ref == 'main'

@@ -1,13 +1,60 @@
+# ── Python ────────────────────────────────────────────────
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
-.mypy_cache/
-.ruff_cache/
-.pytest_cache/
+*.pyd
+*.so
+*.egg
 *.egg-info/
 dist/
 build/
 .venv/
+.env
+
+# ── Type / Lint caches ────────────────────────────────────
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ── uv ────────────────────────────────────────────────────
+# uv.lock is intentionally committed – do NOT ignore it
+
+# ── Generated simulation artefacts ────────────────────────
+# CSV reports exported from the dashboard
+Aether-1-Report-*.csv
+# Experiment run logs
 logs/
 *.jsonl
+experiments/*/
+models/
+
+# ── LLM-generated configs (keep examples, ignore noise) ───
+# Un-comment below if you want to stop tracking generated configs:
+# config/generated_*.json
+# config/battle_royale.json
+
+# ── Web / Node ────────────────────────────────────────────
+web/node_modules/
+web/dist/
+web/.vite/
+
+# ── Scratch / temp files ──────────────────────────────────
 spec_text.txt
+mypy_out*.txt
+pytest_log.txt
+pytest_output.txt
+test_json.py
+test_run.py
+test_ws.py
+analyze_v4.py
+
+# ── OS / editor ───────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~

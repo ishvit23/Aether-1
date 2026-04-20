@@ -102,3 +102,23 @@ uv run python -m tools.train_policy --config config/colony_v4.json --episodes 50
 # 2. Run the Engine with dynamically loaded Brain Policies
 uv run python main.py run --config config/colony_v4.json --policy models/policy_v4.json --ticks 500
 ```
+
+## Phase 5: LLM World Generation & Visual Polish (V5)
+**Theme**: Generative AI bootstrapping and massive visual immersion upgrades.
+- **LLM Generator Architectural Pipeline**: Replaced hardcoded scenario configs with a generative matrix. `tools/generate_scenario.py` leverages `tools/llm_client.py` to ping local LLMs (like Ollama) using natural language prompts to mathematically deduce and construct rigorously constrained `JSON` simulation schemas.
+- **Dynamic Faction Cultures**: The LLM natively outputs custom tribe Names, specific Hex colors, and rich socio-cultural lore descriptions, which are safely parsed by the `WorldLoader` directly into the agent mapping matrix.
+- **2D Pixel Art Overhaul**: Transitioned entirely away from abstract UI shapes into high-resolution discrete 16x16 Pixel Art sprites loaded from `tiles.png`. 
+- **Hue-Shifting Visualizer Cache**: The React frontend securely intercepts the Faction Hex Codes from the Python WebSocket and performs native HTML5 Off-Screen Canvas compositing to mathematically tint plain humanoid sprites to match their exact generated LLM cultures.
+- **Micro-Animations & Atmosphere**: Implemented distinct biome coloring (Spring/Winter transparent screen-tints) and logic-bound floating emojis (⚔️, 💰, 💨) visibly tracking agent intent over their geographical placement on the Dashboard in real-time.
+
+### Relevant Commands (Phase 5)
+```bash
+# 1. Orchestrate an entirely new universe using natural language
+uv run python -m tools.generate_scenario --prompt "Generate a lush forest ecosystem containing a violent Viking tribe with high aggression, and a peaceful druid tribe that runs quickly away."
+
+# 2. Start the FastAPI Backend against the generated LLM scenario 
+uv run uvicorn aether.api.server:app --port 8000
+
+# 3. Open the React Tile-Engine Visualizer
+cd web && npm run dev
+```
